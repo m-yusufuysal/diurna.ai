@@ -1,0 +1,34 @@
+# docker compose up -d --build
+# Gizli değerler .env dosyasından okunur (bkz. DEPLOY.md). Bu dosyaya parola yazmayın.
+services:
+  diurna:
+    build: .
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      UM_TRUST_PROXY: "1"          # tünel/ters vekil arkasında X-Forwarded-* güvenilir
+      UM_FORCE_SECURE: "1"         # çerezler Secure (HTTPS dışarıda sonlanır)
+      UM_DATA_KEY: ${UM_DATA_KEY:?UM_DATA_KEY gerekli (openssl rand -hex 32)}
+      UM_CONTACT: ${UM_CONTACT:-compliance@example.com}
+      UM_FALLBACK_OPENSANCTIONS: ${UM_FALLBACK_OPENSANCTIONS:-0}
+      UM_TRANSLATE_PROVIDER: ${UM_TRANSLATE_PROVIDER:-}
+      UM_DEEPL_KEY: ${UM_DEEPL_KEY:-}
+      UM_LIBRETRANSLATE_URL: ${UM_LIBRETRANSLATE_URL:-}
+      UM_SMTP_HOST: ${UM_SMTP_HOST:-}
+      UM_SMTP_USER: ${UM_SMTP_USER:-}
+      UM_SMTP_PASS: ${UM_SMTP_PASS:-}
+      UM_SMTP_FROM: ${UM_SMTP_FROM:-}
+    volumes:
+      - diurna-data:/app/data
+    ports:
+      - "127.0.0.1:3000:3000"      # yalnızca yerel; dışa tünel/vekil açar
+  cloudflared:                      # isteğe bağlı: adlandırılmış Cloudflare Tunnel
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+    depends_on: [diurna]
+    profiles: ["tunnel"]
+volumes:
+  diurna-data:

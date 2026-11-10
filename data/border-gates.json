@@ -1,0 +1,217 @@
+{
+ "fetchedAt": "2026-11-10T20:42:24.911Z",
+ "source": "https://www.udybelgesi.com/turkiye-sinir-kapilari.asp",
+ "type": "Kara sınır kapıları",
+ "gates": [
+  {
+   "no": 1,
+   "name": "PAZARKULE",
+   "province": "Edirne",
+   "neighbour": "YUNANİSTAN",
+   "active": true
+  },
+  {
+   "no": 2,
+   "name": "İPSALA",
+   "province": "Edirne",
+   "neighbour": "YUNANİSTAN",
+   "active": true
+  },
+  {
+   "no": 3,
+   "name": "KAPIKULE",
+   "province": "Edirne",
+   "neighbour": "BULGARİSTAN",
+   "active": true
+  },
+  {
+   "no": 4,
+   "name": "HAMZABEYLİ",
+   "province": "Edirne",
+   "neighbour": "BULGARİSTAN",
+   "active": true
+  },
+  {
+   "no": 5,
+   "name": "DEREKÖY",
+   "province": "Kırklareli",
+   "neighbour": "BULGARİSTAN",
+   "active": true
+  },
+  {
+   "no": 6,
+   "name": "SARP",
+   "province": "Artvin",
+   "neighbour": "GÜRCİSTAN",
+   "active": true
+  },
+  {
+   "no": 7,
+   "name": "TÜRKGÖZÜ",
+   "province": "Ardahan",
+   "neighbour": "GÜRCİSTAN",
+   "active": true
+  },
+  {
+   "no": 8,
+   "name": "AKTAŞ",
+   "province": "Ardahan",
+   "neighbour": "GÜRCİSTAN",
+   "active": true
+  },
+  {
+   "no": 9,
+   "name": "MURATLI",
+   "province": "Artvin",
+   "neighbour": "GÜRCİSTAN",
+   "active": false
+  },
+  {
+   "no": 10,
+   "name": "DİLUCU",
+   "province": "Iğdır",
+   "neighbour": "NAHCİVAN",
+   "active": true
+  },
+  {
+   "no": 11,
+   "name": "GÜRBULAK",
+   "province": "Ağrı",
+   "neighbour": "İRAN",
+   "active": true
+  },
+  {
+   "no": 12,
+   "name": "KAPIKÖY",
+   "province": "Van",
+   "neighbour": "İRAN",
+   "active": true
+  },
+  {
+   "no": 13,
+   "name": "ESENDERE",
+   "province": "Hakkari",
+   "neighbour": "İRAN",
+   "active": true
+  },
+  {
+   "no": 14,
+   "name": "HABUR",
+   "province": "Şırnak",
+   "neighbour": "IRAK",
+   "active": true
+  },
+  {
+   "no": 15,
+   "name": "DERECİK",
+   "province": "Hakkari",
+   "neighbour": "IRAK",
+   "active": true
+  },
+  {
+   "no": 16,
+   "name": "ÜZÜMLÜ",
+   "province": "Hakkari",
+   "neighbour": "IRAK",
+   "active": true
+  },
+  {
+   "no": 17,
+   "name": "GÜLYAZI",
+   "province": "Şırnak",
+   "neighbour": "IRAK",
+   "active": false
+  },
+  {
+   "no": 18,
+   "name": "AKTEPE",
+   "province": "Şırnak",
+   "neighbour": "IRAK",
+   "active": false
+  },
+  {
+   "no": 19,
+   "name": "OVAKÖY",
+   "province": "Şırnak",
+   "neighbour": "IRAK",
+   "active": false
+  },
+  {
+   "no": 20,
+   "name": "KARKAMIŞ",
+   "province": "Gaziantep",
+   "neighbour": "SURİYE",
+   "active": true
+  },
+  {
+   "no": 21,
+   "name": "CİLVEGÖZÜ",
+   "province": "Hatay",
+   "neighbour": "SURİYE",
+   "active": true
+  },
+  {
+   "no": 22,
+   "name": "YAYLADAĞI",
+   "province": "Hatay",
+   "neighbour": "SURİYE",
+   "active": true
+  },
+  {
+   "no": 23,
+   "name": "NUSAYBİN",
+   "province": "Mardin",
+   "neighbour": "SURİYE",
+   "active": true
+  },
+  {
+   "no": 24,
+   "name": "AKÇAKALE",
+   "province": "Şanlıurfa",
+   "neighbour": "SURİYE",
+   "active": true
+  },
+  {
+   "no": 25,
+   "name": "ÖNCÜPINAR",
+   "province": "Kilis",
+   "neighbour": "SURİYE",
+   "active": true
+  },
+  {
+   "no": 26,
+   "name": "ÇOBANBEY",
+   "province": "Kilis",
+   "neighbour": "SURİYE",
+   "active": true
+  },
+  {
+   "no": 27,
+   "name": "CEYLANPINAR",
+   "province": "Şanlıurfa",
+   "neighbour": "SURİYE",
+   "active": true
+  },
+  {
+   "no": 28,
+   "name": "MÜRŞİTPINAR",
+   "province": "Şanlıurfa",
+   "neighbour": "SURİYE",
+   "active": false
+  },
+  {
+   "no": 29,
+   "name": "KUMLU",
+   "province": "Hatay",
+   "neighbour": "SURİYE",
+   "active": true
+  },
+  {
+   "no": 30,
+   "name": "ŞENYURT",
+   "province": "Mardin",
+   "neighbour": "SURİYE",
+   "active": false
+  }
+ ]
+}

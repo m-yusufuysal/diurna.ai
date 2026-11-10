@@ -1,0 +1,22 @@
+{
+  "name": "uyum-merkezi",
+  "version": "2.0.0",
+  "description": "Diurna – Yaptırım ve Uyum İstihbarat Merkezi – günlük yaptırım bülteni, müşteri tabanı eşleştirme, ticaret kontrolü ve muhabir banka DD",
+  "private": true,
+  "license": "UNLICENSED",
+  "main": "server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node scripts/selftest.js",
+    "build:hs": "node scripts/build-hs-dataset.js",
+    "build:gates": "node scripts/build-border-gates.js"
+  },
+  "dependencies": {
+    "argon2": "^0.45.2",
+    "nodemailer": "^10.5.0",
+    "pdfkit": "^0.20.2"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "statementTitle": "FATF Plenary Ekim 2026 açıklamaları – 30 Ekim 2026",
+  "statementDateISO": "2026-10-30",
+  "verifiedOn": "2026-11-11",
+  "verifiedFrom": "https://www.fatf-gafi.org/en/countries/black-and-grey-lists.html",
+  "note": "Bu liste FATF sitesinden elle/okuyucu ile doğrulanmış anlık görüntüdür. FATF sitesi bot korumalıdır; uygulama canlı çekmeyi dener, başarısız olursa bu veriyi kullanır. Her plenary sonrası (Şubat, Haziran, Ekim) güncelleyin.",
+  "blackTitle": "High-Risk Jurisdictions subject to a Call for Action (“kara liste”)",
+  "greyTitle": "Jurisdictions under Increased Monitoring (“gri liste”)",
+  "black": [
+    {"iso": "KP", "en": "Democratic People's Republic of Korea"},
+    {"iso": "IR", "en": "Iran"},
+    {"iso": "MM", "en": "Myanmar"}
+  ],
+  "grey": [
+    {"iso": "AO", "en": "Angola"},
+    {"iso": "BO", "en": "Bolivia"},
+    {"iso": "BA", "en": "Bosnia and Herzegovina"},
+    {"iso": "CM", "en": "Cameroon"},
+    {"iso": "HT", "en": "Haiti"},
+    {"iso": "IQ", "en": "Iraq"},
+    {"iso": "KE", "en": "Kenya"},
+    {"iso": "KW", "en": "Kuwait"},
+    {"iso": "LA", "en": "Lao People's Democratic Republic"},
+    {"iso": "LB", "en": "Lebanon"},
+    {"iso": "NP", "en": "Nepal"},
+    {"iso": "PG", "en": "Papua New Guinea"},
+    {"iso": "SS", "en": "South Sudan"},
+    {"iso": "SY", "en": "Syria"},
+    {"iso": "VE", "en": "Venezuela"},
+    {"iso": "VN", "en": "Vietnam"},
+    {"iso": "VG", "en": "Virgin Islands (UK)"},
+    {"iso": "YE", "en": "Yemen"}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "_comment": "Yapılandırılmış liste dosyası sunmayan resmî sayfalar: içerik parmak izi + bağlantı farkı ile izlenir (değişince bildirim, eklenen/çıkan bağlantılar gösterilir). URL'ler buradan değiştirilebilir; erişilemeyen sayfa 'hata' olarak görünür, uydurma veri üretilmez.",
+  "pages": [
+    { "id": "eocn", "jur": "AE", "label": "BAE – Yürütme Ofisi (EOCN / UAE IEC): BM ve Yerel Terör Listesi", "url": "https://www.uaeiec.gov.ae/en-us/un-page", "everyMin": 60 },
+    { "id": "cbuae", "jur": "AE", "label": "BAE Merkez Bankası (CBUAE): duyurular", "url": "https://www.cbuae.gov.ae/en/media-and-publications/news", "everyMin": 180 },
+    { "id": "sama", "jur": "SA", "label": "Suudi Arabistan Merkez Bankası (SAMA)", "url": "https://www.sama.gov.sa/en-US/Pages/default.aspx", "everyMin": 180 },
+    { "id": "nctc", "jur": "QA", "label": "Katar Ulusal Terörle Mücadele Komitesi (NCTC): yerel liste", "url": "https://www.nctc.gov.qa/", "everyMin": 120 },
+    { "id": "qcb", "jur": "QA", "label": "Katar Merkez Bankası (QCB)", "url": "https://www.qcb.gov.qa/en/Pages/News.aspx", "everyMin": 180 },
+    { "id": "cbb", "jur": "BH", "label": "Bahreyn Merkez Bankası (CBB)", "url": "https://www.cbb.gov.bh/", "everyMin": 180 },
+    { "id": "masak", "jur": "TR", "label": "MASAK – 6415/7262 mal varlığı dondurma listeleri", "url": "https://masak.hmb.gov.tr/bkk-ile-malvarliklari-dondurulanlar", "everyMin": 60 },
+    { "id": "dfat", "jur": "AU", "label": "Avustralya DFAT – Konsolide Yaptırım Listesi", "url": "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list", "everyMin": 180 },
+    { "id": "mof", "jur": "JP", "label": "Japonya Maliye Bakanlığı (MOF) – ekonomik yaptırımlar", "url": "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/index.html", "everyMin": 180 }
+  ]
+}

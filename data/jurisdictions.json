@@ -1,0 +1,410 @@
+{
+ "disclaimer": {
+  "tr": "Referans eşlemedir; hukuki görüş değildir. Güncel mevzuat ve resmî yayın noktaları yerel hukuk müşaviriyle teyit edilmelidir.",
+  "en": "Reference mapping only, not legal advice. Confirm current legislation and official publication points with local counsel.",
+  "ar": "هذا جدول مرجعي وليس استشارة قانونية. يجب التأكد من التشريعات الحالية ومصادر النشر الرسمية مع مستشار قانوني محلي."
+ },
+ "jurisdictions": [
+  {
+   "code": "TR",
+   "name": {
+    "tr": "Türkiye",
+    "en": "Türkiye",
+    "ar": "تركيا"
+   },
+   "regulators": [
+    {
+     "abbr": "BDDK",
+     "name": "Bankacılık Düzenleme ve Denetleme Kurumu",
+     "role": "Banka denetimi / Bilgi Sistemleri Yönetmeliği",
+     "url": "https://www.bddk.org.tr"
+    },
+    {
+     "abbr": "MASAK",
+     "name": "Mali Suçları Araştırma Kurulu",
+     "role": "FIU / yaptırım ve dondurma kararları",
+     "url": "https://masak.hmb.gov.tr"
+    },
+    {
+     "abbr": "KVKK",
+     "name": "Kişisel Verileri Koruma Kurumu",
+     "role": "Veri koruma otoritesi",
+     "url": "https://www.kvkk.gov.tr"
+    },
+    {
+     "abbr": "TCMB",
+     "name": "Türkiye Cumhuriyet Merkez Bankası",
+     "role": "Merkez bankası",
+     "url": "https://www.tcmb.gov.tr"
+    }
+   ],
+   "laws": [
+    {
+     "ref": "5549",
+     "title": "Suç Gelirlerinin Aklanmasının Önlenmesi Hakkında Kanun"
+    },
+    {
+     "ref": "6415",
+     "title": "Terörizmin Finansmanının Önlenmesi Hakkında Kanun"
+    },
+    {
+     "ref": "7262",
+     "title": "Kitle İmha Silahlarının Yayılmasının Finansmanının Önlenmesi Hakkında Kanun"
+    },
+    {
+     "ref": "6698",
+     "title": "Kişisel Verilerin Korunması Kanunu (KVKK)"
+    },
+    {
+     "ref": "BDDK",
+     "title": "Bankaların Bilgi Sistemleri ve Elektronik Bankacılık Hizmetleri Hakkında Yönetmelik"
+    }
+   ],
+   "lists": [
+    {
+     "id": "tr-masak",
+     "name": "Mal varlığı dondurma kararları (6415 / 7262)",
+     "authority": "MASAK / Hazine ve Maliye Bakanlığı",
+     "url": "https://masak.hmb.gov.tr",
+     "access": "link",
+     "note": "Kararlar Resmî Gazete’de ilan edilir; otomatik çekim bu sürümde yok, bağlantı + anahtar kelime izleme önerilir."
+    },
+    {
+     "id": "tr-rg",
+     "name": "Resmî Gazete (Cumhurbaşkanı / Bakanlık kararları)",
+     "authority": "T.C. Cumhurbaşkanlığı İletişim Başkanlığı",
+     "url": "https://www.resmigazete.gov.tr",
+     "access": "link",
+     "note": "Günlük ilan; “mal varlığı dondurulması” ifadeli kararlar için izleme."
+    }
+   ],
+   "dataProtection": "KVKK 6698 — veri yerleşimi için yurt dışı aktarım kuralları (m.9) dikkate alınmalı",
+   "timezone": "Europe/Istanbul",
+   "defaultLang": "tr"
+  },
+  {
+   "code": "AE",
+   "name": {
+    "tr": "Birleşik Arap Emirlikleri",
+    "en": "United Arab Emirates",
+    "ar": "الإمارات العربية المتحدة"
+   },
+   "regulators": [
+    {
+     "abbr": "CBUAE",
+     "name": "Central Bank of the UAE",
+     "role": "Bank supervisor",
+     "url": "https://www.centralbank.ae"
+    },
+    {
+     "abbr": "EOCN",
+     "name": "Executive Office for Control & Non-Proliferation",
+     "role": "TFS / local terrorist list",
+     "url": "https://www.uaeiec.gov.ae"
+    },
+    {
+     "abbr": "UAE FIU",
+     "name": "UAE Financial Intelligence Unit",
+     "role": "FIU (goAML)",
+     "url": "https://www.uaefiu.gov.ae"
+    }
+   ],
+   "laws": [
+    {
+     "ref": "FDL 20/2018",
+     "title": "Federal Decree-Law on AML/CFT/CPF"
+    },
+    {
+     "ref": "Cabinet Decision 74/2020",
+     "title": "Terrorism lists regulation & targeted financial sanctions"
+    },
+    {
+     "ref": "FDL 45/2021",
+     "title": "Personal Data Protection Law (PDPL)"
+    }
+   ],
+   "lists": [
+    {
+     "id": "ae-ltl",
+     "name": "UAE Local Terrorist List & UN TFS notifications",
+     "authority": "EOCN",
+     "url": "https://www.uaeiec.gov.ae",
+     "access": "link",
+     "note": "Official publication via EOCN; automatic ingestion not included — link source."
+    }
+   ],
+   "dataProtection": "PDPL 45/2021; DIFC / ADGM have separate regimes",
+   "timezone": "Asia/Dubai",
+   "defaultLang": "en"
+  },
+  {
+   "code": "SA",
+   "name": {
+    "tr": "Suudi Arabistan",
+    "en": "Saudi Arabia",
+    "ar": "المملكة العربية السعودية"
+   },
+   "regulators": [
+    {
+     "abbr": "SAMA",
+     "name": "Saudi Central Bank",
+     "role": "Bank supervisor / Cyber Security Framework",
+     "url": "https://www.sama.gov.sa"
+    },
+    {
+     "abbr": "SAFIU",
+     "name": "Saudi Financial Intelligence Unit",
+     "role": "FIU",
+     "url": "https://www.sa-fiu.gov.sa"
+    }
+   ],
+   "laws": [
+    {
+     "ref": "M/20 (2017)",
+     "title": "Anti-Money Laundering Law"
+    },
+    {
+     "ref": "M/21 (2017)",
+     "title": "Law of Terrorism Crimes and Financing"
+    },
+    {
+     "ref": "M/19 (2021)",
+     "title": "Personal Data Protection Law"
+    }
+   ],
+   "lists": [
+    {
+     "id": "sa-list",
+     "name": "Local designation lists (terrorism / TFS)",
+     "authority": "Presidency of State Security / Ministry of Interior",
+     "url": "https://www.moi.gov.sa",
+     "access": "link",
+     "note": "Confirm the official publication point with the regulator; link source."
+    }
+   ],
+   "dataProtection": "PDPL M/19 2021; SAMA Cyber Security Framework; in-Kingdom hosting commonly expected",
+   "timezone": "Asia/Riyadh",
+   "defaultLang": "ar"
+  },
+  {
+   "code": "QA",
+   "name": {
+    "tr": "Katar",
+    "en": "Qatar",
+    "ar": "قطر"
+   },
+   "regulators": [
+    {
+     "abbr": "QCB",
+     "name": "Qatar Central Bank",
+     "role": "Bank supervisor",
+     "url": "https://www.qcb.gov.qa"
+    },
+    {
+     "abbr": "QFIU",
+     "name": "Qatar Financial Information Unit",
+     "role": "FIU",
+     "url": "https://www.qfiu.gov.qa"
+    },
+    {
+     "abbr": "NCTC",
+     "name": "National Counter Terrorism Committee",
+     "role": "Domestic terrorist list / UN TFS",
+     "url": "https://www.nctc.gov.qa"
+    }
+   ],
+   "laws": [
+    {
+     "ref": "Law 20/2019",
+     "title": "Combating Money Laundering and Terrorism Financing"
+    },
+    {
+     "ref": "Law 13/2016",
+     "title": "Personal Data Privacy Protection"
+    }
+   ],
+   "lists": [
+    {
+     "id": "qa-nctc",
+     "name": "NCTC designations (local lists)",
+     "authority": "NCTC",
+     "url": "https://www.nctc.gov.qa",
+     "access": "link",
+     "note": "Link source; verify publication format."
+    }
+   ],
+   "dataProtection": "Law 13/2016 personal data privacy",
+   "timezone": "Asia/Qatar",
+   "defaultLang": "ar"
+  },
+  {
+   "code": "BH",
+   "name": {
+    "tr": "Bahreyn",
+    "en": "Bahrain",
+    "ar": "البحرين"
+   },
+   "regulators": [
+    {
+     "abbr": "CBB",
+     "name": "Central Bank of Bahrain",
+     "role": "Bank supervisor / Rulebook",
+     "url": "https://www.cbb.gov.bh"
+    },
+    {
+     "abbr": "AMLU",
+     "name": "Anti-Money Laundering Unit",
+     "role": "FIU",
+     "url": "https://www.moi.gov.bh"
+    }
+   ],
+   "laws": [
+    {
+     "ref": "Decree-Law 4/2001",
+     "title": "AML/CFT (as amended, incl. Decree-Law 54/2018)"
+    },
+    {
+     "ref": "Law 30/2018",
+     "title": "Personal Data Protection Law"
+    }
+   ],
+   "lists": [
+    {
+     "id": "bh-list",
+     "name": "Local terrorist / TFS lists",
+     "authority": "Ministry of Interior / MOFA",
+     "url": "https://www.moi.gov.bh",
+     "access": "link",
+     "note": "Link source; verify publication point."
+    }
+   ],
+   "dataProtection": "PDPL 30/2018",
+   "timezone": "Asia/Bahrain",
+   "defaultLang": "en"
+  },
+  {
+   "code": "KW",
+   "name": {
+    "tr": "Kuveyt",
+    "en": "Kuwait",
+    "ar": "الكويت"
+   },
+   "regulators": [
+    {
+     "abbr": "CBK",
+     "name": "Central Bank of Kuwait",
+     "role": "Bank supervisor",
+     "url": "https://www.cbk.gov.kw"
+    },
+    {
+     "abbr": "KwFIU",
+     "name": "Kuwait Financial Intelligence Unit",
+     "role": "FIU",
+     "url": "https://www.kwfiu.gov.kw"
+    }
+   ],
+   "laws": [
+    {
+     "ref": "Law 106/2013",
+     "title": "AML/CFT Law"
+    },
+    {
+     "ref": "CITRA",
+     "title": "Data Privacy Protection Regulation (CITRA)"
+    }
+   ],
+   "lists": [
+    {
+     "id": "kw-list",
+     "name": "Local terrorist / TFS lists",
+     "authority": "National Committee for Combating Terrorism / MOFA",
+     "url": "https://www.mofa.gov.kw",
+     "access": "link",
+     "note": "Link source; verify publication point."
+    }
+   ],
+   "dataProtection": "CITRA data privacy regulation",
+   "timezone": "Asia/Kuwait",
+   "defaultLang": "ar"
+  },
+  {
+   "code": "OM",
+   "name": {
+    "tr": "Umman",
+    "en": "Oman",
+    "ar": "عُمان"
+   },
+   "regulators": [
+    {
+     "abbr": "CBO",
+     "name": "Central Bank of Oman",
+     "role": "Bank supervisor",
+     "url": "https://cbo.gov.om"
+    },
+    {
+     "abbr": "NCFI",
+     "name": "National Centre for Financial Information",
+     "role": "FIU",
+     "url": "https://www.rop.gov.om"
+    }
+   ],
+   "laws": [
+    {
+     "ref": "RD 30/2016",
+     "title": "AML/CFT Law"
+    },
+    {
+     "ref": "RD 6/2022",
+     "title": "Personal Data Protection Law"
+    }
+   ],
+   "lists": [
+    {
+     "id": "om-list",
+     "name": "Local terrorist / TFS lists",
+     "authority": "National Committee for Combating Terrorism",
+     "url": "https://www.mofa.gov.om",
+     "access": "link",
+     "note": "Link source; verify publication point."
+    }
+   ],
+   "dataProtection": "PDPL RD 6/2022",
+   "timezone": "Asia/Muscat",
+   "defaultLang": "ar"
+  }
+ ],
+ "residency": [
+  {
+   "id": "cloud-eu",
+   "name": {
+    "tr": "Bulut – AB bölgesi",
+    "en": "Cloud – EU region",
+    "ar": "سحابة – منطقة الاتحاد الأوروبي"
+   }
+  },
+  {
+   "id": "cloud-tr",
+   "name": {
+    "tr": "Bulut – Türkiye içi",
+    "en": "Cloud – in Türkiye",
+    "ar": "سحابة – داخل تركيا"
+   }
+  },
+  {
+   "id": "cloud-gcc",
+   "name": {
+    "tr": "Bulut – Körfez ülkesi içi (BAE / S. Arabistan / Katar …)",
+    "en": "Cloud – in-country GCC (UAE / KSA / Qatar …)",
+    "ar": "سحابة – داخل دول الخليج (الإمارات / السعودية / قطر …)"
+   }
+  },
+  {
+   "id": "onprem",
+   "name": {
+    "tr": "Şirket içi (on-prem) / özel bulut",
+    "en": "On-premises / private cloud",
+    "ar": "داخل المقر / سحابة خاصة"
+   }
+  }
+ ]
+}

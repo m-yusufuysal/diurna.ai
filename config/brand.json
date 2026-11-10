@@ -1,0 +1,40 @@
+{
+  "_comment": "Marka tek yerden değiştirilir: isim/slogan/renk/logo bu dosyada ve public/brand/ altındadır. Arayüz, e-postalar, bülten ve sunucu bu dosyayı okur.",
+  "name": {
+    "tr": "Diurna",
+    "en": "Diurna",
+    "ar": "Diurna"
+  },
+  "shortName": {
+    "tr": "Diurna",
+    "en": "Diurna",
+    "ar": "Diurna"
+  },
+  "descriptor": {
+    "tr": "Yaptırım ve Uyum İstihbarat Merkezi",
+    "en": "Sanctions & Compliance Intelligence",
+    "ar": "منصة استخبارات العقوبات والامتثال"
+  },
+  "tagline": {
+    "tr": "Bugün ne değişti. Şimdi ne yapmalı.",
+    "en": "What changed today. What to do next.",
+    "ar": "ما الذي تغيّر اليوم، وما الذي ينبغي فعله."
+  },
+  "logo": "/brand/logo.svg",
+  "wordmark": "/brand/wordmark.svg",
+  "wordmarkLight": "/brand/wordmark-light.svg",
+  "favicon": "/brand/favicon.svg",
+  "colors": {
+    "navy": "#0B1F3A",
+    "navy2": "#14325C",
+    "accent": "#C6A15B",
+    "accentDark": "#D8B877",
+    "paper": "#F4EFE3"
+  },
+  "supportEmail": "destek@example.com",
+  "legalEntity": "Placeholder Yazılım A.Ş. (Diurna için yer tutucu şirket)",
+  "emailSender": {
+    "name": "Diurna",
+    "from": "diurna@example.bank"
+  }
+}
