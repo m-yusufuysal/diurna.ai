@@ -10,7 +10,7 @@ jobs:
   gitleaks:                      # tüm geçmişi tara
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { fetch-depth: 0 }
       - name: gitleaks
         run: |
@@ -20,7 +20,7 @@ jobs:
   deps:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
       - run: npm ci --omit=dev
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: { contents: read, security-events: write }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: github/codeql-action/init@v3
         with: { languages: javascript-typescript, queries: security-extended }
       - uses: github/codeql-action/analyze@v3
@@ -41,13 +41,13 @@ jobs:
     runs-on: ubuntu-latest
     container: { image: semgrep/semgrep:latest }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: semgrep scan --error --config p/javascript --config p/nodejs --config p/secrets --config p/owasp-top-ten --exclude docs --exclude node_modules
 
   tests:                         # selftest + kiracılar arası / rol kapısı testleri (boş geçici veriyle, STRICT)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
       - run: npm ci
@@ -65,7 +65,7 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: docker build -t diurna:ci .
       - name: non-root + trivy
         run: |
