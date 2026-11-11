@@ -1,11 +1,11 @@
 # Diurna – tek konteyner; kalıcı veri /app/data (birim olarak bağlayın)
-FROM node:22-bookworm-slim AS deps
+FROM node:26-bookworm-slim AS deps
 WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
-FROM node:22-bookworm-slim
+FROM node:26-bookworm-slim
 ENV NODE_ENV=production PORT=3000
 # UM_TRUST_PROXY yalnızca güvenilir ters vekil arkasında, çalışma zamanında verilir (compose'ta var); varsayılan KAPALI
 RUN apt-get update && apt-get install -y --no-install-recommends poppler-utils && rm -rf /var/lib/apt/lists/*
