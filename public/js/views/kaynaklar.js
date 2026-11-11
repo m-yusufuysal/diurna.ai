@@ -3,12 +3,31 @@ import motor from './motor.js';
 import { icon, tabsBar, emptyState, tip, statusPill, srcName, trBtn } from '../ui.js';
 const TABS = [['', 'src.dir'], ['durum', 'src.status'], ['fatf', 'src.tabFatf'], ['kapilar', 'src.gates'], ['mevzuat', 'src.reg'], ['motor', 'src.engine']];
 const head = sub => h`<div class="page-head"><div><div class="eyebrow">${t('nav.kaynaklar')}</div><h1>${t('src.title')}</h1><p>${t('src.sub')}</p></div></div>${tabsBar('#/kaynaklar', TABS, sub || '')}`;
-const autoBadge = a => a === 'live' ? h`<span class="badge ok">${t('src.auto.live')}</span>` : a === 'optional' ? h`<span class="badge warn">${t('src.auto.optional')}</span>` : h`<span class="badge">${t('src.auto.link')}</span>`;
+const BCLS = { ok: 'ok', on_demand: 'info', partial: 'warn', blocked: 'err', pending: '', off_admin: '', off_license: '', off_platform: '', link: '', data: '', info: '', external: '' };
+const staticState = a => ({ link: 'link', data: 'data', info: 'info', external: 'external' })[a] || 'link';
+function badge(i, stt) {
+  const st = (i.key && stt[i.key]) || { state: staticState(i.auto) }; const c = BCLS[st.state] ?? '';
+  const sub = st.total ? ` ${st.ok}/${st.total}` : '';
+  return h`<span class="badge ${c}"${st.lastOk ? h` title="${t('src.lastOk')}: ${fmtDT(st.lastOk)}"` : ''}>${t('src.st.' + st.state)}${sub}</span>`;
+}
+function note(i, stt, isAdmin) {
+  const st = (i.key && stt[i.key]) || null; if (!st) return '';
+  const bits = [];
+  if (st.state === 'off_admin') bits.push(isAdmin ? h`<a href="#/yonetim/listeler">${t('src.how.admin')} →</a>` : h`${t('src.how.askAdmin')}`);
+  if (st.notInScope) bits.push(isAdmin ? h`${t('src.how.scope')} <a href="#/yonetim/listeler">${t('src.how.scopeGo')} →</a>` : t('src.how.scope') + ' ' + t('src.how.askAdmin'));
+  if (st.state === 'off_license') bits.push(t('src.how.license'));
+  if (st.state === 'off_platform') bits.push(t('src.how.platform'));
+  if (st.failed?.length) bits.push(st.failed.map(f => h`${f.name}${f.kind ? ' – ' + t('st.why.' + f.kind) : ''}`).reduce((a, x, n) => n ? [...a, '; ', x] : [x], []));
+  else if (['partial', 'blocked'].includes(st.state) && st.kind) bits.push(t('st.why.' + st.kind));
+  if (st.lastOk && ['ok', 'partial'].includes(st.state)) bits.push(t('src.lastOk') + ': ' + rel(st.lastOk));
+  return bits.length ? h`<div class="xs muted srcnote">${bits.map((b, n) => n ? h` · ${b}` : h`${b}`)}</div>` : '';
+}
 export default {
   async render(el, sub) {
     if (sub === 'motor') return motor(el, head('motor')); if (sub === 'durum') return status(el); if (sub === 'fatf') return fatf(el); if (sub === 'kapilar') return gates(el); if (sub === 'mevzuat') return reg(el);
     const d = await api('/sources');
-    el.innerHTML = head('') + d.directory.groups.map(g => h`<div class="card" style="margin-bottom:18px"><div class="card-h"><h3>${L(g)}</h3></div><div class="card-b flush"><table class="tbl"><tbody>${g.items.map(i => h`<tr><td style="width:36%"><a href="${i.url}" target="_blank" rel="noopener noreferrer"><b>${i.name}</b> ↗</a></td><td>${autoBadge(i.auto)}</td><td class="small muted">${L(i.scope)}</td></tr>`)}</tbody></table></div></div>`).join('');
+    const stt = d.states || {};
+    el.innerHTML = head('') + d.directory.groups.map(g => h`<div class="card" style="margin-bottom:18px"><div class="card-h"><h3>${L(g)}</h3></div><div class="card-b flush">${g.items.map(i => h`<div class="srcrow"><div class="srcname"><a href="${i.url}" target="_blank" rel="noopener noreferrer"><b>${i.name}</b> ↗</a></div><div class="srcbadge">${badge(i, stt)}</div><div class="srcdesc small muted">${L(i.scope)}${note(i, stt, d.isAdmin)}</div></div>`)}</div></div>`).join('');
   },
   async live(type, el, sub) { if (sub === 'durum' && ['jobs', 'scan', 'lists'].includes(type)) await status(el); },
 };

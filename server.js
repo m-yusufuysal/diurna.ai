@@ -357,12 +357,12 @@ R('GET', /^\/api\/match$/, async (req, res) => send(res, 200, store.matchRun() |
 R('POST', /^\/api\/match\/run$/, async (req, res, m, q, u) => { const b = await readBody(req); const r = screening.runFull(+b.threshold || undefined); store.logAudit(u, 'match.run', '', `Toplu tarama: ${r ? r.hitCount + ' olası eşleşme / ' + r.screened : 'müşteri yok'}`); send(res, 200, r); });
 R('GET', /^\/api\/adverse\/info$/, async (req, res) => send(res, 200, require('./lib/adverse').info()));
 R('POST', /^\/api\/adverse$/, async (req, res, m, q, u) => {
-  const A = require('./lib/adverse'); if (!A.enabled()) return send(res, 403, { error: 'external_lookups_disabled', message: 'Dış aramalar bu kurulumda kapalı (UM_EXTERNAL_LOOKUPS=0).' });
+  const A = require('./lib/adverse'); if (!A.enabled()) return send(res, 403, { error: 'external_lookups_disabled', message: A.hardOff() ? 'Dış sorgular bu kurulumda kapalı.' : 'Dış sorgular kapalı; yönetici Yönetim → Listeler ekranından açabilir.' });
   if (!sec.rateLimit('adv:' + u.id, 20, 60e3).ok) return send(res, 429, { error: 'rate', message: 'Çok fazla istek' });
   const b = await readBody(req); const name = String(b.name || '').slice(0, 120); const out = { name };
   store.logAudit(u, 'adverse.lookup', name.slice(0, 80), 'GDELT' + (b.interpol ? '+Interpol' : ''));
-  try { out.gdelt = await A.gdelt(name); } catch (e) { out.gdelt = { error: e.message }; }
-  if (b.interpol) { try { out.interpol = await A.interpol(name); } catch (e) { out.interpol = { error: e.message }; } }
+  if (A.gdeltOn()) { try { out.gdelt = await A.gdelt(name); } catch (e) { out.gdelt = { error: e.message }; } } else out.gdelt = { error: 'Olumsuz haber taraması kapalı; yönetici Yönetim → Listeler ekranından açabilir.' };
+  if (b.interpol && A.interpolOn()) { try { out.interpol = await A.interpol(name); } catch (e) { out.interpol = { error: e.message }; } }
   send(res, 200, out);
 });
 R('POST', /^\/api\/screen\/ownership$/, async (req, res, m, q, u) => {
@@ -416,7 +416,45 @@ R('POST', /^\/api\/dd\/draft$/, async (req, res, m, q, u) => { const b = await r
 R('PUT', /^\/api\/dd\/draft\/([\w-]+)$/, async (req, res, m, q, u) => { if (!guard(u, 'write', res)) return; const b = await readBody(req); const dd = store.dd(); const d = (dd.drafts || []).find(x => x.id === m[1]); if (!d) return send(res, 404, {}); d.rows = b.rows || d.rows; d.updatedAt = new Date().toISOString(); store.saveDD(dd); if (b.approved) store.logAudit(u, 'dd.draft.approve', d.id, `${d.rows.filter(r => r.decision === 'ok').length}/${d.rows.length} onaylı`); send(res, 200, d); });
 
 // Kaynaklar / referans
-R('GET', /^\/api\/sources$/, async (req, res) => send(res, 200, { directory: JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'sources.json'), 'utf8')), status: sourceMeta(), lists: L.meta(), listDefs: L.DEFS }));
+/* Kaynak rehberi: her kaynağın canlı durumu gerçek yapılandırma ve iş durumundan hesaplanır (sabit etiket yok).
+   Durumlar: ok, partial, blocked, pending, on_demand, off_admin, off_license, off_platform; statik: link, data, info, external. */
+const errKind = e => !e ? null : /robots/i.test(e) ? 'robots' : /zaman a/i.test(e) ? 'timeout' : /HTTP\s?\d|\b40\d\b|\b50\d\b/.test(e) ? 'http' : /fetch failed|ECONN|ENOTFOUND|SSRF|alınamadı|ulaşıl|reddetti/i.test(e) ? 'net' : 'other';
+function directoryStates(dir) {
+  const A = require('./lib/adverse'); const jobs = sched.snapshot(); const meta = sourceMeta(); const lm = L.meta(); const st = store.settings();
+  const en = new Set(st.listsEnabled && st.listsEnabled.length ? st.listsEnabled : Object.keys(L.DEFS));
+  const jobState = j => { if (!j) return { state: 'pending' }; const bad = j.lastError && (!j.lastOk || (j.lastRun && j.lastRun > j.lastOk)); if (bad) return { state: j.lastOk ? 'partial' : 'blocked', kind: errKind(j.lastError), lastOk: j.lastOk }; if (j.lastOk) return { state: 'ok', lastOk: j.lastOk }; return { state: 'pending' }; };
+  const watch = WATCH.summary(); const out = {};
+  const compute = key => {
+    if (key === 'info') return { state: 'info' };
+    if (key === 'os') { const on = process.env.UM_FALLBACK_OPENSANCTIONS === '1' || Object.keys(L.DEFS).some(k => /^os_/.test(k)); return on ? { state: 'ok', standby: true } : { state: 'off_license' }; }
+    if (key === 'gdelt') { if (A.hardOff()) return { state: 'off_platform' }; if (!A.gdeltOn()) return { state: 'off_admin', where: 'listeler' }; const o = A.lastOutcome('gdelt'); return o && !o.ok ? { state: 'blocked', kind: errKind(o.error), lastOk: null } : { state: 'on_demand' }; }
+    if (key === 'interpol') { if (A.hardOff()) return { state: 'off_platform' }; if (!A.interpolOn()) return { state: 'off_admin', where: 'listeler' }; const o = A.lastOutcome('interpol'); return o && !o.ok ? { state: 'blocked', kind: errKind(o.error) } : { state: 'on_demand' }; }
+    if (key === 'pep') return L.DEFS.pep ? jobState(jobs.find(j => j.id === 'list:pep')) : { state: 'off_license' };
+    if (key.startsWith('watch:')) {
+      const ids = key.slice(6).split(','); const pages = watch.filter(w => ids.includes(w.id)); const okp = pages.filter(w => !w.error && w.checkedAt);
+      const failed = pages.filter(w => w.error || !w.checkedAt).map(w => ({ id: w.id, name: w.id.toUpperCase().replace(/-/g, ' '), kind: errKind(w.error) }));
+      const lastOk = okp.map(w => w.checkedAt).sort().pop() || null;
+      return { state: !pages.length ? 'pending' : failed.length === 0 ? 'ok' : okp.length ? 'partial' : (pages.every(w => !w.checkedAt) ? 'pending' : 'blocked'), ok: okp.length, total: pages.length, failed, lastOk };
+    }
+    const [kind, k] = key.split(':');
+    if (kind === 'list') {
+      if (!L.DEFS[k]) return { state: 'off_license' };
+      let r = jobState(jobs.find(j => j.id === 'list:' + k)); if (r.state === 'pending' && lm[k]?.fetchedAt) r = { state: 'ok', lastOk: lm[k].fetchedAt };
+      return { ...r, count: lm[k]?.count || 0, notInScope: !en.has(k), where: !en.has(k) ? 'listeler' : undefined };
+    }
+    if (kind === 'news') {
+      const m = meta.find(x => x.key === k); if (!m) return { state: 'pending' };
+      const ms = m.status; if (ms === 'ok') return { state: 'ok', lastOk: m.lastOk };
+      if (ms === 'degraded') return { state: 'partial', kind: m.reasonKind, lastOk: m.lastOk };
+      if (ms === 'error' || ms === 'blocked') return { state: m.lastOk ? 'partial' : 'blocked', kind: m.reasonKind, lastOk: m.lastOk };
+      return { state: 'pending' };
+    }
+    return { state: 'pending' };
+  };
+  for (const g of dir.groups) for (const i of g.items) if (i.key && !(i.key in out)) out[i.key] = compute(i.key);
+  return out;
+}
+R('GET', /^\/api\/sources$/, async (req, res, m, q, u) => { const directory = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'sources.json'), 'utf8')); let states = {}; try { states = directoryStates(directory); } catch (e) { console.error('directoryStates', e.message); } send(res, 200, { directory, states, isAdmin: u?.role === 'Admin', status: sourceMeta(), lists: L.meta(), listDefs: L.DEFS }); });
 R('GET', /^\/api\/fatf$/, async (req, res) => { const f = T.fatf(); const ctr = Object.fromEntries(T.countries().map(c => [c.iso, c])); send(res, 200, { ...f, black: f.black.map(x => ({ ...x, tr: ctr[x.iso]?.tr || x.en })), grey: f.grey.map(x => ({ ...x, tr: ctr[x.iso]?.tr || x.en })) }); });
 R('GET', /^\/api\/audit$/, async (req, res, m, q, u) => { if (!guard(u, 'approve', res)) return; send(res, 200, { events: store.audit(500), verify: store.verifyAudit() }); });
 R('GET', /^\/api\/audit\.csv$/, async (req, res, m, q, u) => { if (!guard(u, 'approve', res)) return; const rows = [['n', 'zaman_utc', 'kullanici', 'rol', 'islem', 'hedef', 'ayrinti', 'hash'], ...store.audit().map(e => [e.n, e.ts, e.user, e.role, e.action, e.target, e.detail, e.hash])]; send(res, 200, sec.toCSV(rows), 'text/csv; charset=utf-8', { 'Content-Disposition': 'attachment; filename="denetim-izi.csv"' }); });
@@ -430,6 +468,7 @@ R('PUT', /^\/api\/settings$/, async (req, res, m, q, u) => {
   if (Array.isArray(b.listsEnabled)) { const ok = b.listsEnabled.filter(x => Object.keys(L.DEFS).includes(x)); if (!ok.length) return send(res, 422, { error: 'lists', message: 'En az bir liste açık olmalı' }); s.listsEnabled = ok; setTimeout(() => screening.runAllOrgs(), 50); }
   if (b.listThresholds && typeof b.listThresholds === 'object') { const lt = {}; for (const [k, v] of Object.entries(b.listThresholds)) if (L.DEFS[k] && v !== null && v !== '' && +v) lt[k] = Math.min(100, Math.max(60, Math.round(+v))); s.listThresholds = lt; store.logAudit(u, 'settings.listThresholds', '', Object.entries(lt).map(([k, v]) => k + '=' + v).join(', ') || 'varsayılan'); setTimeout(() => screening.runAllOrgs(), 50); }
   if (b.ai && 'enabled' in b.ai) { s.ai = { enabled: b.ai.enabled === null ? null : !!b.ai.enabled }; store.logAudit(u, 'settings.ai', '', 'Yapay zekâ (harici LLM) ayarı: ' + (s.ai.enabled === null ? 'varsayılan' : s.ai.enabled ? 'açık' : 'kapalı')); }
+  if (b.lookups && typeof b.lookups === 'object') { const tri = v => v === null || v === 'null' ? null : v === true || v === 'true'; const prev = JSON.stringify(s.lookups || {}); s.lookups = { gdelt: 'gdelt' in b.lookups ? tri(b.lookups.gdelt) : (s.lookups?.gdelt ?? null), interpol: 'interpol' in b.lookups ? tri(b.lookups.interpol) : (s.lookups?.interpol ?? null) }; if (JSON.stringify(s.lookups) !== prev) { const f = v => v === null ? 'varsayılan' : v ? 'açık' : 'kapalı'; store.logAudit(u, 'settings.lookups', '', `Dış sorgular: GDELT olumsuz haber ${f(s.lookups.gdelt)}, Interpol kırmızı bülten ${f(s.lookups.interpol)}`); } }
   if ('fourEyes' in b) s.fourEyes = !!b.fourEyes; if (b.defaultLang && I.langs.includes(b.defaultLang)) s.defaultLang = b.defaultLang;
   if (b.retention) for (const k of ['notificationsDays', 'outboxDays', 'auditYears', 'scansDays']) if (k in b.retention) s.retention[k] = Math.max(1, Math.min(3650, +b.retention[k] || 1));
   if (b.slaHours) for (const k of ['critical', 'high', 'normal']) if (k in b.slaHours) s.slaHours[k] = Math.max(1, Math.min(240, +b.slaHours[k] || 1));

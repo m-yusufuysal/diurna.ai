@@ -454,3 +454,8 @@ a.cite,span.cite{font-size:11px;color:#3d5a8a;text-decoration:none;margin-inline
 :where(svg[aria-hidden=true]){width:1.1em;height:1.1em;flex:none;vertical-align:-.15em}
 .pop .it{align-items:center}.pop .it svg{width:18px;height:18px;flex:none;color:var(--muted)}
 .rail-row:has(+ .rail-why){border-bottom:0}.rail-why{margin:-4px 0 0;padding:0 0 7px;border-bottom:1px solid var(--line);overflow-wrap:anywhere;line-height:1.4}
+
+/* Kaynak rehberi satırları: başlık · durum · açıklama (dar ekranda tek sütun, tam genişlik) */
+.srcrow{display:grid;grid-template-columns:minmax(0,34%) max-content minmax(0,1fr);gap:6px 18px;align-items:start;padding:13px 18px;border-bottom:1px solid var(--line)}
+.srcrow:last-child{border-bottom:0}.srcname a{text-decoration:none}.srcname b{overflow-wrap:anywhere}.srcbadge .badge{white-space:nowrap}.srcdesc{line-height:1.55;overflow-wrap:anywhere}.srcnote{margin-top:5px}
+@media(max-width:700px){.srcrow{grid-template-columns:minmax(0,1fr) max-content;gap:6px 12px;padding:14px 16px}.srcname{grid-column:1}.srcbadge{grid-column:2;grid-row:1}.srcdesc{grid-column:1 / -1}}
