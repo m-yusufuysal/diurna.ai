@@ -70,5 +70,5 @@ jobs:
       - name: non-root + trivy
         run: |
           test "$(docker run --rm --entrypoint id diurna:ci -u)" != "0"
-      - uses: aquasecurity/trivy-action@0.28.0
+      - uses: aquasecurity/trivy-action@v0.36.0
         with: { image-ref: diurna:ci, severity: "HIGH,CRITICAL", exit-code: "1", ignore-unfixed: true }
