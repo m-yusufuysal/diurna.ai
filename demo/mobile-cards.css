@@ -1,0 +1,22 @@
+/* Telefonda (≤700px) tablolar etiketli kartlara dönüşür; mobile.css'teki yatay kaydırmalı tablo yalnızca tablet için kalır. */
+@media(max-width:700px){
+  .tbl-wrap{overflow:visible!important}
+  .tbl{display:block!important;min-width:0!important;width:100%}
+  .tbl thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .tbl tbody,.tbl tfoot{display:block;width:100%}
+  .tbl tr{display:block;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .tbl tr:last-child{border-bottom:0}
+  .tbl tbody tr:hover{background:transparent}
+  .tbl td,.tbl td:first-child{display:grid;grid-template-columns:minmax(84px,36%) minmax(0,1fr);gap:2px 12px;align-items:start;padding:5px 0;border:0;font-size:14px;text-align:start!important;overflow-wrap:anywhere;position:static!important;box-shadow:none!important;background:transparent!important;inset-inline-start:auto}
+  .tbl td::before{content:attr(data-label);color:var(--muted);font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;line-height:1.6;padding-top:1px}
+  [dir=rtl] .tbl td::before{letter-spacing:0;text-transform:none}
+  .tbl td:first-child[data-label]{display:block;font-size:15px;font-weight:600;padding:0 0 6px;margin-bottom:4px;border-bottom:1px dotted var(--line-2)}
+  .tbl td:first-child[data-label]::before{content:none}
+  .tbl td:not([data-label]),.tbl td[data-label=""],.tbl td[colspan]{display:block}
+  .tbl td:not([data-label])::before,.tbl td[data-label=""]::before,.tbl td[colspan]::before{content:none}
+  .tbl td:empty{display:none}
+  .tbl td>.score,.tbl td>.badge,.tbl td>.risk,.tbl td>.sla,.tbl td>.st,.tbl td>.tag{justify-self:start;align-self:start}
+  .tbl td .btn{max-width:100%}
+  .tbl td.num,.tbl td.right{text-align:start}
+  tr.clk:active{background:var(--surface-2)}
+}

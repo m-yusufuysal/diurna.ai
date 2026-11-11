@@ -67,12 +67,14 @@ try { fs.writeFileSync(path.join(OUT, 'brand.css'), require(path.join(SRC, 'lib'
 let ix = fs.readFileSync(path.join(OUT, 'index.html'), 'utf8');
 ix = ix.replace('<script src="js/boot.js"></script>', '<script src="demo/engine.js"></script>\n<script src="demo/shim.js"></script>\n<script src="js/boot.js"></script>');
 ix = ix.replace(/<title>.*?<\/title>/, '<title>Diurna</title>').replace('</head>', '<meta name="robots" content="noindex">\n</head>');
+ix = ix.replace('</head>', '<link rel="stylesheet" href="demo/mobile-cards.css">\n<script src="demo/tables.js" defer></script>\n</head>');
 fs.writeFileSync(path.join(OUT, 'index.html'), ix);
 fs.writeFileSync(path.join(OUT, '404.html'), '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=./"><a href="./">Diurna</a>');
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 
 /* 5) shim + tarayıcı motoru (sunucu kütüphanelerinin saf JS modülleri, Node bağımlılıkları taklit edilerek) */
 fs.copyFileSync(path.join(ROOT, 'demo', 'shim.js'), path.join(OUT, 'demo', 'shim.js'));
+for (const f of ['mobile-cards.css', 'tables.js']) fs.copyFileSync(path.join(ROOT, 'demo', f), path.join(OUT, 'demo', f));
 const MODS = ['match', 'util', 'i18n', 'customers', 'trade', 'dd'];
 let eng = '/* Otomatik üretildi (scripts/build-static-demo.js): lib/*.js saf modüllerinin tarayıcı paketi */\n(function(){\n"use strict";\nconst defs = {};\n';
 for (const m of MODS) { const src = fs.readFileSync(path.join(SRC, 'lib', m + '.js'), 'utf8'); eng += `defs[${JSON.stringify(m)}] = function (module, exports, require, __dirname) {\n${src}\n};\n`; }
