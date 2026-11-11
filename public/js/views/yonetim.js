@@ -1,12 +1,12 @@
 import { S, h, raw, t, L, api, me, esc, rel, fmtD, fmtDT, num, money, toast, isAdmin, loadStatus } from '../core.js';
 import { icon, tabsBar, emptyState, tip, modal, confirmBox, copyText, down } from '../ui.js';
-const TABS = [['', 'adm.org'], ['kullanicilar', 'adm.users'], ['subeler', 'adm.branches'], ['listeler', 'adm.lists'], ['mevzuat', 'adm.reg'], ['entegrasyon', 'adm.integr'], ['guvenlik', 'adm.security'], ['yz', 'adm.ai']];
+const TABS = [['', 'adm.org'], ['kullanicilar', 'adm.users'], ['subeler', 'adm.branches'], ['listeler', 'adm.lists'], ['lisansli', 'adm.byol'], ['mevzuat', 'adm.reg'], ['entegrasyon', 'adm.integr'], ['guvenlik', 'adm.security'], ['yz', 'adm.ai']];
 const head = sub => h`<div class="page-head"><div><div class="eyebrow">${t('nav.yonetim')}</div><h1>${t('adm.title')}</h1><p>${t('adm.sub')}</p></div></div>${tabsBar('#/yonetim', TABS, sub || '')}`;
 const num2 = (el, k) => +el.querySelector(`[data-s="${k}"]`).value;
 export default {
   async render(el, sub) {
     if (!isAdmin()) { el.innerHTML = emptyState('common.noAccessT', 'common.noAccessD').toString(); return; }
-    ({ '': org, kullanicilar: users, subeler: branches, listeler: lists, mevzuat: reg, entegrasyon: integr, guvenlik: security, yz: aiTab })[sub || '']?.(el);
+    ({ '': org, kullanicilar: users, subeler: branches, listeler: lists, lisansli: byolTab, mevzuat: reg, entegrasyon: integr, guvenlik: security, yz: aiTab })[sub || '']?.(el);
   },
 };
 async function org(el) {
@@ -97,4 +97,26 @@ async function aiTab(el) {
     <div class="row"><button class="btn pri" id="aisv">${t('common.save')}</button></div><p class="hint">${t('aiadm.hint')}</p></div></div>
   <div class="card"><div class="card-h"><h3>${t('aiadm.log')}</h3></div><div class="card-b flush">${log.length ? h`<table class="tbl tight"><thead><tr><th>${t('common.date')}</th><th>${t('aiadm.task')}</th><th>${t('aiadm.user')}</th><th>${t('aiadm.model')}</th></tr></thead><tbody>${log.slice(0, 40).map(x => h`<tr><td class="xs nowrap">${fmtDT(x.ts)}</td><td class="small">${x.task}<div class="xs muted">${x.ref || ''}</div></td><td class="xs">${x.user}</td><td class="xs mono">${x.model}</td></tr>`)}</tbody></table>` : h`<div class="card-b muted small">${t('aiadm.noLog')}</div>`}</div></div></div>`;
   el.querySelector('#aisv').onclick = async () => { const v = el.querySelector('#aiset').value; await api('/settings', { method: 'PUT', body: { ai: { enabled: v === 'null' ? null : v === 'true' } } }); toast(t('common.saved'), ''); await loadStatus(); aiTab(el); };
+}
+
+const BCLS = { unset: '', configured: 'warn', connected: 'ok', error: 'err' };
+const EPF = [['baseUrl', 'https://api.ornek.com'], ['tokenUrl', 'https://auth.ornek.com/oauth/token'], ['testPath', '/v1/ping'], ['dataPath', '/v1/sanctions/export'], ['authHeader', 'X-Api-Key'], ['format', 'json|csv'], ['jsonPath', 'data.items'], ['mapName', 'name'], ['mapAliases', 'aliases'], ['mapId', 'id'], ['mapType', 'type'], ['mapCountry', 'country'], ['mapProgram', 'program'], ['mapDate', 'listedOn']];
+async function byolTab(el) {
+  const d = await api('/byol').catch(() => ({ providers: [] }));
+  const card = p => h`<div class="card byol-card" data-p="${p.id}" style="margin-bottom:14px"><div class="card-h" style="flex-wrap:wrap;gap:8px"><h3>${p.name}</h3><span class="badge ${BCLS[p.state] || ''}">${t('byol.st.' + p.state)}</span>${p.verified ? h`<span class="badge ok">${t('byol.verified')}</span>` : h`<span class="badge">${t('byol.generic')}</span>`}</div>
+    <div class="card-b stack">${p.message ? h`<p class="small muted" style="margin:0">${p.message}${p.testedAt ? ' · ' + fmtDT(p.testedAt) : ''}</p>` : ''}
+    <div class="grid g2">${p.fields.map(f => h`<label class="small">${t('byol.f.' + f)}<input type="password" autocomplete="new-password" data-cf="${f}" placeholder="${p.credentials[f].set ? p.credentials[f].masked + ' — ' + t('byol.replace') : t('byol.enter')}"></label>`)}</div>
+    ${p.adapter === 'generic' ? h`<details><summary class="small">${t('byol.endpoint')}</summary><p class="small muted">${t('byol.endpointHelp')}${p.docs ? h` <a href="${p.docs}" target="_blank" rel="noopener noreferrer">${t('byol.docs')}</a>` : ''}</p><div class="grid g2">${EPF.map(([k, ph]) => h`<label class="small">${t('byol.e.' + k)}<input data-ef="${k}" value="${p.endpoint[k] || ''}" placeholder="${ph}"></label>`)}</div></details>` : h`<p class="small muted" style="margin:0">${t('byol.osHelp')}</p>`}
+    ${p.sync ? h`<p class="small muted" style="margin:0">${p.sync.error ? t('byol.syncErr') + ': ' + p.sync.error : t('byol.synced') + ': ' + p.sync.count + ' · ' + fmtDT(p.sync.at)}</p>` : ''}
+    <div class="row wrap" style="gap:8px;align-items:center"><button class="btn primary" data-a="save">${t('common.save')}</button><button class="btn" data-a="test"${p.state === 'unset' ? ' disabled' : ''}>${t('byol.test')}</button><button class="btn" data-a="sync"${p.state === 'unset' ? ' disabled' : ''}>${t('byol.sync')}</button><label class="small row" style="gap:6px;align-items:center"><input type="checkbox" data-a="en"${p.enabled ? ' checked' : ''}${p.state === 'unset' ? ' disabled' : ''}> ${t('byol.enable')}</label><span class="sp"></span><button class="btn danger" data-a="del"${p.state === 'unset' ? ' disabled' : ''}>${t('byol.del')}</button></div></div></div>`;
+  el.innerHTML = head('lisansli') + h`<div class="card" style="margin-bottom:14px"><div class="card-b"><p style="margin:0">${t('byol.sub')}</p><p class="small muted" style="margin:6px 0 0">${t('byol.secNote')}</p></div></div>${d.providers.map(card)}`;
+  el.querySelectorAll('.byol-card').forEach(c => {
+    const id = c.dataset.p; const val = () => ({ credentials: Object.fromEntries([...c.querySelectorAll('[data-cf]')].map(x => [x.dataset.cf, x.value])), endpoint: Object.fromEntries([...c.querySelectorAll('[data-ef]')].map(x => [x.dataset.ef, x.value])) });
+    const run = async (fn, ok) => { try { await fn(); toast(ok, ''); byolTab(el); } catch (e) { toast(t('common.error'), e.message); } };
+    c.querySelector('[data-a=save]').onclick = () => run(() => api('/byol/' + id, { method: 'PUT', body: val() }), t('common.saved'));
+    c.querySelector('[data-a=test]').onclick = () => run(() => api('/byol/' + id + '/test', { method: 'POST', body: {} }), t('byol.tested'));
+    c.querySelector('[data-a=sync]').onclick = () => run(() => api('/byol/' + id + '/sync', { method: 'POST', body: {} }), t('byol.synced'));
+    c.querySelector('[data-a=en]').onchange = ev => run(() => api('/byol/' + id, { method: 'PUT', body: { enabled: ev.target.checked } }), t('common.saved'));
+    c.querySelector('[data-a=del]').onclick = async () => { if (await confirmBox(t('byol.del'), t('byol.delConfirm'), t('byol.del'))) run(() => api('/byol/' + id, { method: 'DELETE' }), t('common.saved')); };
+  });
 }

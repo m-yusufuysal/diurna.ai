@@ -164,6 +164,18 @@ async function main() {
   for (const p of ['/api/status', '/api/org/users', '/api/me/security', '/api/settings/full', '/api/webhooks', '/api/apikeys']) { const r = await adminA.get(p); { const mm = /"pwHash"|\$argon2|scrypt\$|"secret":"[0-9a-f]{20,}|um_live_[A-Za-z0-9_-]{20,}|"pending":"enc1|"recovery":\[/.exec(r.text); t(`GET ${p} parola özeti/TOTP sırrı/ham API anahtarı içermez`, !mm, mm && r.text.slice(Math.max(0, mm.index - 40), mm.index + 60)); } }
   const wk2 = await adminA.get('/api/webhooks'); t('Webhook gizli anahtarı maskeli', (wk2.data?.hooks || []).every(h => /…$/.test(h.secret || '…')));
 
+  const SECV = ['TOP', 'SECRET', '-', '9876'].join('');
+  lines.push('\n[11] BYOL (lisanslı veri ortakları)');
+  for (const [nm, c] of [['Uyum yöneticisi', mgrA], ['Analist', anA], ['Okuyucu', affA]]) { const g = await c.get('/api/byol'); const w = await c.raw('PUT', '/api/byol/custom', { body: { credentials: { secret: 'X' } } }); t(nm + ' BYOL ekranına/yazmaya erişemez (403)', g.status === 403 && w.status === 403, 'get=' + g.status + ' put=' + w.status); }
+  const bad1 = await adminA.raw('PUT', '/api/byol/custom', { body: { credentials: { secret: SECV }, endpoint: { baseUrl: 'http://example.com' } } }); t('BYOL: http:// adresi reddedilir', bad1.status === 422, 'status=' + bad1.status);
+  const bad2 = await adminA.raw('PUT', '/api/byol/custom', { body: { endpoint: { baseUrl: 'https://127.0.0.1/' } } }); t('BYOL: özel/yerel adres reddedilir (SSRF)', bad2.status === 422, 'status=' + bad2.status);
+  const okp = await adminA.raw('PUT', '/api/byol/custom', { body: { credentials: { secret: SECV }, endpoint: { baseUrl: 'https://example.com', testPath: '/ping' } } });
+  const lst = await adminA.get('/api/byol'); const raw = JSON.stringify(lst.data) + JSON.stringify(okp.data); t('BYOL: yanıtlarda gizli değer yok, yalnızca son 4 karakter', okp.status === 200 && !raw.includes(SECV.slice(0, 9)) && raw.includes('9876'), 'status=' + okp.status);
+  const au = await adminA.get('/api/audit'); t('BYOL: denetim kaydında gizli değer yok, işlem kayıtlı', !JSON.stringify(au.data).includes(SECV.slice(0, 9)) && JSON.stringify(au.data).includes('byol.update'));
+  const tn = await anA.raw('POST', '/api/byol/custom/test', { body: {} }); t('BYOL: analist bağlantı testi başlatamaz', tn.status === 403, 'status=' + tn.status);
+  await adminA.raw('DELETE', '/api/byol/custom', {});
+  const lst2 = await adminA.get('/api/byol'); t('BYOL: silme sonrası kimlik bilgisi kalmaz', (lst2.data?.providers || []).every(x => x.state === 'unset'));
+
   console.log(lines.join('\n')); console.log(`\nSonuç: ${res.pass} geçti, ${res.fail} BAŞARISIZ, ${res.known} bilinen/açık${STRICT ? '' : ' (STRICT=1 ile bunlar da başarısız sayılır)'}`);
   process.exit(res.fail ? 1 : 0);
 }

@@ -165,6 +165,7 @@ Administration is available to the **Admin** role only.
 | **Users** | Add users (temporary password shown once), assign role and branch, deactivate, reset MFA. Password resets are done by the platform team. |
 | **Branches** | Head office–region–branch hierarchy. |
 | **Lists** | Lists included in customer screening and per-list thresholds. The **External lookups** card sets *Adverse news (GDELT)* and *Interpol red notices* to Installation default / On / Off; changes are written to the audit trail. Also the internal block list. |
+| **Licensed data partners** | Connect your own data-provider subscription (BYOL, see below). |
 | **Legislation and data** | Regulatory layers the institution is subject to (TR, AE, SA, QA, BH, KW, OM) and data-residency record. |
 | **Integrations** | E-mail (SMTP), API keys (value shown once), webhooks. A single-sign-on settings form exists but is not functional yet. |
 | **Security** | MFA requirement, idle timeout, minimum password length, IP allow-list, retention periods, audit export. |
@@ -173,6 +174,19 @@ Administration is available to the **Admin** role only.
 **Enabling sources.** For a source marked "Off – admin can enable", the link beside it leads to **Administration → Lists**. Sources marked "Off – licence required" (OpenSanctions fallback, UAE/Qatar/Saudi lists, PEP) need a licence and are enabled at installation level, not from the admin screen.
 
 **AI key.** AI and translation connect to a provider configured at installation (environment variables, see the Turkish document's technical section). The AI tab only switches the feature on or off for your institution; without a configured provider the buttons explain why they do not work, and nothing is fabricated.
+
+### Bring your own licence (BYOL)
+If your institution subscribes to a data provider, enter its credentials under **Administration → Licensed data partners** to add that data to customer screening. Diurna neither sells nor redistributes the data; it connects to your provider with your account.
+
+| Provider | Connection type |
+|---|---|
+| **OpenSanctions** | Verified: the API key is really tested against `api.opensanctions.org` (`Authorization: ApiKey`). Licensed bulk data (UAE, Qatar, Saudi Arabia) is added to screening when it can be fetched; delivery depends on your contract and, if it fails, the reason is shown. |
+| Dow Jones Risk & Compliance, LSEG World-Check One, LexisNexis Bridger / WorldCompliance, Moody’s / Bureau van Dijk Orbis, Refinitiv, ComplyAdvantage, Sayari | Generic HTTP adapter (OAuth2, Bearer, Basic or custom header). These providers’ real endpoints depend on your contract, so you enter the addresses and field mapping from your provider’s API documentation. |
+| **Custom REST (HTTPS)** | Any HTTPS service: base URL, authentication, JSON or CSV format and field mapping (name, aliases, id, type, country, program, date). SFTP is not supported yet. |
+
+Steps: enter the details on the provider card → **Save** → **Test connection** → **Sync now** → **Include in screening**. Status is always truthful: *Not set up*, *Configured – not tested*, *Connected* or *Error: …*. Synced records appear in your screening as the source “Licensed data partner (your institution)” and carry their own badge in the **Sources** directory.
+
+Security: credentials are encrypted per institution with AES-256-GCM, never returned to the UI or API responses (only the last 4 characters), managed by the Admin role only, every change is written to the audit trail (never the value) and outbound addresses pass the SSRF guard; only public `https://` addresses are accepted. Synced data stays within your institution.
 
 ## 10. Security
 

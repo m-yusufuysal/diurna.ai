@@ -426,6 +426,7 @@ function directoryStates(dir) {
   const watch = WATCH.summary(); const out = {};
   const compute = key => {
     if (key === 'info') return { state: 'info' };
+    if (key === 'byol') { const b = require('./lib/byol').summary(); if (b.active) return { state: 'ok', lastOk: null, count: b.records, names: b.names }; if (b.error) return { state: 'blocked', reason: b.error, where: 'lisansli' }; return { state: 'off_admin', where: 'lisansli' }; }
     if (key === 'os') { const on = process.env.UM_FALLBACK_OPENSANCTIONS === '1' || Object.keys(L.DEFS).some(k => /^os_/.test(k)); return on ? { state: 'ok', standby: true } : { state: 'off_license' }; }
     if (key === 'gdelt') { if (A.hardOff()) return { state: 'off_platform' }; if (!A.gdeltOn()) return { state: 'off_admin', where: 'listeler' }; const o = A.lastOutcome('gdelt'); return o && !o.ok ? { state: 'blocked', kind: errKind(o.error), lastOk: null } : { state: 'on_demand' }; }
     if (key === 'interpol') { if (A.hardOff()) return { state: 'off_platform' }; if (!A.interpolOn()) return { state: 'off_admin', where: 'listeler' }; const o = A.lastOutcome('interpol'); return o && !o.ok ? { state: 'blocked', kind: errKind(o.error) } : { state: 'on_demand' }; }
@@ -456,6 +457,14 @@ function directoryStates(dir) {
 }
 R('GET', /^\/api\/sources$/, async (req, res, m, q, u) => { const directory = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'sources.json'), 'utf8')); let states = {}; try { states = directoryStates(directory); } catch (e) { console.error('directoryStates', e.message); } send(res, 200, { directory, states, isAdmin: u?.role === 'Admin', status: sourceMeta(), lists: L.meta(), listDefs: L.DEFS }); });
 R('GET', /^\/api\/fatf$/, async (req, res) => { const f = T.fatf(); const ctr = Object.fromEntries(T.countries().map(c => [c.iso, c])); send(res, 200, { ...f, black: f.black.map(x => ({ ...x, tr: ctr[x.iso]?.tr || x.en })), grey: f.grey.map(x => ({ ...x, tr: ctr[x.iso]?.tr || x.en })) }); });
+/* BYOL – kurumun kendi lisanslı veri ortağı abonelikleri: yalnızca admin; kimlik bilgileri asla geri dönmez. */
+const BY = require('./lib/byol');
+const byErr = (res, e) => send(res, e.status || 500, { error: 'byol', message: e.status ? e.message : 'İşlem tamamlanamadı.' });
+R('GET', /^\/api\/byol$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; send(res, 200, { providers: BY.list() }); });
+R('PUT', /^\/api\/byol\/([a-z]+)$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; try { send(res, 200, BY.setCreds(m[1], await readBody(req), u)); } catch (e) { byErr(res, e); } });
+R('DELETE', /^\/api\/byol\/([a-z]+)$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; try { send(res, 200, BY.remove(m[1], u)); } catch (e) { byErr(res, e); } });
+R('POST', /^\/api\/byol\/([a-z]+)\/test$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; try { send(res, 200, await BY.test(m[1], u)); } catch (e) { byErr(res, e); } });
+R('POST', /^\/api\/byol\/([a-z]+)\/sync$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; try { send(res, 200, await BY.sync(m[1], u)); } catch (e) { byErr(res, e); } });
 R('GET', /^\/api\/audit$/, async (req, res, m, q, u) => { if (!guard(u, 'approve', res)) return; send(res, 200, { events: store.audit(500), verify: store.verifyAudit() }); });
 R('GET', /^\/api\/audit\.csv$/, async (req, res, m, q, u) => { if (!guard(u, 'approve', res)) return; const rows = [['n', 'zaman_utc', 'kullanici', 'rol', 'islem', 'hedef', 'ayrinti', 'hash'], ...store.audit().map(e => [e.n, e.ts, e.user, e.role, e.action, e.target, e.detail, e.hash])]; send(res, 200, sec.toCSV(rows), 'text/csv; charset=utf-8', { 'Content-Disposition': 'attachment; filename="denetim-izi.csv"' }); });
 

@@ -11,6 +11,7 @@
   const LS = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch { } };
   const lang = () => LS('um.lang') || document.documentElement.lang || 'tr';
   const MSG = {
+    byol: { tr: 'Demo sürümünde kimlik bilgisi kaydedilmez ve sağlayıcıya bağlanılmaz. Gerçek kurulumda bu ekran çalışır.', en: 'The demo does not store credentials or connect to providers. This screen works in a real installation.', ar: 'لا تحفظ النسخة التجريبية بيانات الاعتماد ولا تتصل بالمزوّدين. تعمل هذه الشاشة في التثبيت الفعلي.' },
     off: { tr: 'Bu özellik bu sürümde kapalı.', en: 'This feature is turned off in this version.', ar: 'هذه الميزة غير متاحة في هذا الإصدار.' },
     ai: { tr: 'Yapay zekâ özellikleri bu sürümde kapalı.', en: 'AI features are turned off in this version.', ar: 'ميزات الذكاء الاصطناعي غير متاحة في هذا الإصدار.' },
     tr: { tr: 'Çeviri bu sürümde kapalı.', en: 'Translation is turned off in this version.', ar: 'الترجمة غير متاحة في هذا الإصدار.' },
@@ -205,6 +206,7 @@
       const direct = rows.filter(r => r.hits.length).reduce((a, r) => a + r.pct, 0);
       return json({ rows, aggregatePct: direct, level: direct >= 50 ? 'block' : direct >= 25 ? 'edd' : rows.some(r => r.hits.length) ? 'review' : 'clear', note: 'Pratik ilk sürüm: yalnızca girilen doğrudan/dolaylı pay yüzdeleri toplanır; sahiplik grafı (zincirleme çarpma) yoktur.' });
     }
+    if (path.startsWith('/byol') && method !== 'GET') return json({ error: 'demo', message: m('byol') }, 403);
     if (path === '/adverse') return json({ error: 'external_lookups_disabled', message: m('off') }, 403);
     if (path === '/trade/check') { const D = await engine(); const I = D.req('i18n'); try { return json(D.req('trade').assess(bq, I.langs.includes(bq.lang) ? bq.lang : 'tr')); } catch (e) { return json({ error: 'bad', message: e.message }, 400); } }
     if (path === '/trade/notes' && method === 'POST') { const r = { id: 'T' + uid(), at: new Date().toISOString(), by: me().name, ref: String(bq.ref || '').slice(0, 100), level: bq.level, note: String(bq.note || '').slice(0, 8000), input: bq.input }; db['/trade/notes'].unshift(r); return json(r); }

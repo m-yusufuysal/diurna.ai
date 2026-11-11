@@ -13,7 +13,7 @@ function badge(i, stt) {
 function note(i, stt, isAdmin) {
   const st = (i.key && stt[i.key]) || null; if (!st) return '';
   const bits = [];
-  if (st.state === 'off_admin') bits.push(isAdmin ? h`<a href="#/yonetim/listeler">${t('src.how.admin')} →</a>` : h`${t('src.how.askAdmin')}`);
+  if (st.state === 'off_admin') bits.push(isAdmin ? h`<a href="#/yonetim/${st.where || 'listeler'}">${t('src.how.admin')} →</a>` : h`${t('src.how.askAdmin')}`);
   if (st.notInScope) bits.push(isAdmin ? h`${t('src.how.scope')} <a href="#/yonetim/listeler">${t('src.how.scopeGo')} →</a>` : t('src.how.scope') + ' ' + t('src.how.askAdmin'));
   if (st.state === 'off_license') bits.push(t('src.how.license'));
   if (st.state === 'off_platform') bits.push(t('src.how.platform'));

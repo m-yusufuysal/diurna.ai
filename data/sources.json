@@ -1,698 +1,709 @@
 {
- "groups": [
-  {
-   "id": "bulletin",
-   "tr": "Günlük bülten kaynakları (otomatik izlenir)",
-   "en": "Daily bulletin sources (monitored automatically)",
-   "ar": "مصادر النشرة اليومية (تُراقَب تلقائيًا)",
-   "items": [
+  "groups": [
     {
-     "key": "news:ofac",
-     "name": "OFAC – Recent Actions",
-     "url": "https://ofac.treasury.gov/recent-actions",
-     "auto": "live",
-     "scope": {
-      "tr": "OFAC’ın son işlem duyuruları: ekleme, güncelleme, silme, genel lisans ve uygulama kararları. Gemi, kişi ve kuruluş eklemeleri müşteri tabanınızla otomatik karşılaştırılır.",
-      "en": "OFAC’s latest action notices: additions, updates, removals, general licences and enforcement. New vessels, persons and entities are checked against your customer base automatically.",
-      "ar": "إعلانات OFAC الأخيرة: الإضافات والتحديثات والحذف والتراخيص العامة وإجراءات الإنفاذ. تُقارَن السفن والأشخاص والكيانات المضافة بقاعدة عملائكم تلقائيًا."
-     }
+      "id": "bulletin",
+      "tr": "Günlük bülten kaynakları (otomatik izlenir)",
+      "en": "Daily bulletin sources (monitored automatically)",
+      "ar": "مصادر النشرة اليومية (تُراقَب تلقائيًا)",
+      "items": [
+        {
+          "key": "news:ofac",
+          "name": "OFAC – Recent Actions",
+          "url": "https://ofac.treasury.gov/recent-actions",
+          "auto": "live",
+          "scope": {
+            "tr": "OFAC’ın son işlem duyuruları: ekleme, güncelleme, silme, genel lisans ve uygulama kararları. Gemi, kişi ve kuruluş eklemeleri müşteri tabanınızla otomatik karşılaştırılır.",
+            "en": "OFAC’s latest action notices: additions, updates, removals, general licences and enforcement. New vessels, persons and entities are checked against your customer base automatically.",
+            "ar": "إعلانات OFAC الأخيرة: الإضافات والتحديثات والحذف والتراخيص العامة وإجراءات الإنفاذ. تُقارَن السفن والأشخاص والكيانات المضافة بقاعدة عملائكم تلقائيًا."
+          }
+        },
+        {
+          "key": "list:ofac",
+          "name": "OFAC – SDN listesi",
+          "url": "https://sanctionssearch.ofac.treas.gov/",
+          "auto": "live",
+          "scope": {
+            "tr": "Tam SDN listesi düzenli olarak indirilir; isim ve IMO numarası ile aranabilir.",
+            "en": "The full SDN list is downloaded regularly and can be searched by name and IMO number.",
+            "ar": "تُنزَّل قائمة SDN الكاملة بانتظام ويمكن البحث فيها بالاسم ورقم IMO."
+          }
+        },
+        {
+          "key": "news:uk",
+          "name": "UK – Sanctions List duyuruları (GOV.UK)",
+          "url": "https://www.gov.uk/government/publications/the-uk-sanctions-list",
+          "auto": "live",
+          "scope": {
+            "tr": "Birleşik Krallık yaptırım duyuruları GOV.UK üzerinden izlenir. Tek resmî liste UK Sanctions List’tir (OFSI konsolide listesi 28 Ocak 2026’da kapandı).",
+            "en": "UK sanctions notices are followed on GOV.UK. The UK Sanctions List is the single official list (the OFSI consolidated list closed on 28 January 2026).",
+            "ar": "تُتابَع إعلانات العقوبات البريطانية عبر GOV.UK. قائمة UK Sanctions List هي القائمة الرسمية الوحيدة (أُغلقت قائمة OFSI الموحّدة في 28 يناير 2026)."
+          }
+        },
+        {
+          "key": "list:uk",
+          "name": "UK Sanctions List (ana liste)",
+          "url": "https://www.gov.uk/government/publications/the-uk-sanctions-list",
+          "auto": "live",
+          "scope": {
+            "tr": "Yeni kişi, kuruluş ve gemi eklemeleri, çıkarmalar ve kayıt değişiklikleri günlük izlenir.",
+            "en": "New persons, entities and vessels, removals and record changes are tracked daily.",
+            "ar": "تُتابَع يوميًا الإضافات الجديدة للأشخاص والكيانات والسفن وعمليات الحذف وتغييرات السجلات."
+          }
+        },
+        {
+          "key": null,
+          "name": "UK Sanctions List Search",
+          "url": "https://search-uk-sanctions-list.service.gov.uk/",
+          "auto": "link",
+          "scope": {
+            "tr": "Belirli bir kişi, kuruluş veya gemi için resmî arama sayfası.",
+            "en": "Official search page for a specific person, entity or vessel.",
+            "ar": "صفحة البحث الرسمية عن شخص أو كيان أو سفينة محددة."
+          }
+        },
+        {
+          "key": null,
+          "name": "Russia – Designations and Sanctions Notices",
+          "url": "https://www.gov.uk/guidance/russia-list-of-designations-and-sanctions-notices",
+          "auto": "link",
+          "scope": {
+            "tr": "Rusya yaptırım rejiminde yayımlanan yeni karar ve duyurular.",
+            "en": "New decisions and notices under the Russia sanctions regime.",
+            "ar": "القرارات والإعلانات الجديدة ضمن نظام العقوبات المتعلق بروسيا."
+          }
+        },
+        {
+          "key": "news:uk",
+          "name": "OFSI General Licences",
+          "url": "https://www.gov.uk/government/collections/ofsi-general-licences",
+          "auto": "live",
+          "scope": {
+            "tr": "Yeni genel lisans (General Licence) yayımları; seyrek yayımlanır.",
+            "en": "New general licences; published infrequently.",
+            "ar": "التراخيص العامة الجديدة؛ تُنشر بشكل متباعد."
+          }
+        },
+        {
+          "key": "news:uk",
+          "name": "OFSI Enforcement / Monetary Penalties",
+          "url": "https://www.gov.uk/government/collections/enforcement-of-financial-sanctions",
+          "auto": "live",
+          "scope": {
+            "tr": "Para cezaları, uzlaşmalar ve uygulama kararları; bilgi amaçlıdır.",
+            "en": "Monetary penalties, settlements and enforcement actions; for information.",
+            "ar": "الغرامات والتسويات وإجراءات الإنفاذ؛ للاطلاع."
+          }
+        },
+        {
+          "key": null,
+          "name": "OFSI ana sayfa",
+          "url": "https://www.gov.uk/government/organisations/office-of-financial-sanctions-implementation",
+          "auto": "link",
+          "scope": {
+            "tr": "Rehberler, duyurular ve önemli güncellemeler.",
+            "en": "Guidance, announcements and key updates.",
+            "ar": "الإرشادات والإعلانات وأهم المستجدات."
+          }
+        },
+        {
+          "key": null,
+          "name": "Current UK sanctions regimes",
+          "url": "https://www.gov.uk/government/collections/uk-sanctions",
+          "auto": "link",
+          "scope": {
+            "tr": "Ülke bazlı rejimler ve mevzuat değişiklikleri.",
+            "en": "Country regimes and legislative changes.",
+            "ar": "أنظمة العقوبات حسب الدولة والتغييرات التشريعية."
+          }
+        },
+        {
+          "key": "news:eu",
+          "name": "AB – Resmî Gazete (EUR-Lex, L serisi)",
+          "url": "https://eur-lex.europa.eu/oj/direct-access.html",
+          "auto": "live",
+          "scope": {
+            "tr": "AB Resmî Gazetesi’nin mevzuat bölümü; bakılan gün ve bir önceki gün taranır.",
+            "en": "The legislation section of the EU Official Journal; the current and previous day are scanned.",
+            "ar": "قسم التشريعات في الجريدة الرسمية للاتحاد الأوروبي؛ يُفحص اليوم الحالي واليوم السابق."
+          }
+        },
+        {
+          "key": "list:eu",
+          "name": "AB – Konsolide finansal yaptırım listesi",
+          "url": "https://www.sanctionsmap.eu/",
+          "auto": "live",
+          "scope": {
+            "tr": "AB’nin kişi ve kuruluş listesi; isim ve IMO numarası ile aranabilir.",
+            "en": "The EU list of persons and entities; searchable by name and IMO number.",
+            "ar": "قائمة الاتحاد الأوروبي للأشخاص والكيانات؛ يمكن البحث بالاسم ورقم IMO."
+          }
+        },
+        {
+          "key": "news:un",
+          "name": "BM Güvenlik Konseyi – basın duyuruları",
+          "url": "https://press.un.org/en/content/security-council",
+          "auto": "live",
+          "scope": {
+            "tr": "Listeye ekleme veya çıkarma içeren duyurular öne çıkarılır; silinme (çıkarma) olursa ayrıca dikkat çekilir.",
+            "en": "Notices about additions or removals are highlighted; removals get extra attention.",
+            "ar": "تُبرَز الإعلانات المتعلقة بالإضافة أو الحذف من القائمة، وتحظى حالات الحذف باهتمام إضافي."
+          }
+        },
+        {
+          "key": "list:un",
+          "name": "BM Konsolide Yaptırım Listesi",
+          "url": "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list",
+          "auto": "live",
+          "scope": {
+            "tr": "BM Güvenlik Konseyi’nin konsolide listesi düzenli olarak indirilir.",
+            "en": "The UN Security Council consolidated list is downloaded regularly.",
+            "ar": "تُنزَّل القائمة الموحّدة لمجلس الأمن الدولي بانتظام."
+          }
+        },
+        {
+          "key": "news:fatf",
+          "name": "FATF – kara ve gri listeler",
+          "url": "https://www.fatf-gafi.org/en/countries/black-and-grey-lists.html",
+          "auto": "live",
+          "scope": {
+            "tr": "Yılda üç genel kurul sonrasında güncellenir; ülke tablosu uygulama içinde tutulur.",
+            "en": "Updated after the three plenaries each year; the country table is kept inside the application.",
+            "ar": "تُحدَّث بعد الاجتماعات العامة الثلاثة كل عام؛ ويُحتفظ بجدول الدول داخل التطبيق."
+          }
+        },
+        {
+          "key": null,
+          "name": "FATF – Publications",
+          "url": "http://www.fatf-gafi.org/",
+          "auto": "link",
+          "scope": {
+            "tr": "FATF yayınları ve haberler.",
+            "en": "FATF publications and news.",
+            "ar": "منشورات FATF وأخبارها."
+          }
+        },
+        {
+          "key": "info",
+          "name": "ABD Dışişleri – Basın bültenleri",
+          "url": "https://www.state.gov/press-releases/",
+          "auto": "info",
+          "scope": {
+            "tr": "Bültene dahil edilmez; yalnızca bilgi amacıyla okunur.",
+            "en": "Not included in the bulletin; read for information only.",
+            "ar": "لا تدخل في النشرة؛ تُقرأ للاطلاع فقط."
+          }
+        }
+      ]
     },
     {
-     "key": "list:ofac",
-     "name": "OFAC – SDN listesi",
-     "url": "https://sanctionssearch.ofac.treas.gov/",
-     "auto": "live",
-     "scope": {
-      "tr": "Tam SDN listesi düzenli olarak indirilir; isim ve IMO numarası ile aranabilir.",
-      "en": "The full SDN list is downloaded regularly and can be searched by name and IMO number.",
-      "ar": "تُنزَّل قائمة SDN الكاملة بانتظام ويمكن البحث فيها بالاسم ورقم IMO."
-     }
+      "id": "global",
+      "tr": "Küresel ve bölgesel listeler",
+      "en": "Global and regional lists",
+      "ar": "القوائم العالمية والإقليمية",
+      "items": [
+        {
+          "key": "list:ofacc",
+          "name": "OFAC – Konsolide (SDN dışı) liste",
+          "url": "https://sanctionslistservice.ofac.treas.gov/api/download/CONS_PRIM.CSV",
+          "auto": "live",
+          "scope": {
+            "tr": "SSI, NS-MBS ve benzeri SDN dışı OFAC listeleri.",
+            "en": "SSI, NS-MBS and other non-SDN OFAC lists.",
+            "ar": "قوائم OFAC من خارج SDN مثل SSI وNS-MBS."
+          }
+        },
+        {
+          "key": "list:csl",
+          "name": "ABD – Consolidated Screening List (BIS, Entity List vb.)",
+          "url": "https://data.trade.gov/downloadable_consolidated_screening_list/v1/consolidated.csv",
+          "auto": "live",
+          "scope": {
+            "tr": "BIS Entity List, Denied Persons, Unverified ve MEU listeleri ile ABD Dışişleri kayıtları. Varsayılan olarak kapalıdır; yönetici Yönetim → Listeler ekranından açar.",
+            "en": "BIS Entity List, Denied Persons, Unverified and MEU lists plus US State Department records. Off by default; an administrator turns it on under Administration → Lists.",
+            "ar": "قوائم BIS (Entity List وDenied Persons وUnverified وMEU) وسجلات وزارة الخارجية الأمريكية. مغلقة افتراضيًا؛ يفعّلها المسؤول من الإدارة ← القوائم."
+          }
+        },
+        {
+          "key": "list:ca",
+          "name": "Kanada – SEMA yaptırım listesi",
+          "url": "https://www.international.gc.ca/world-monde/assets/office_docs/international_relations-relations_internationales/sanctions/sema-lmes.xml",
+          "auto": "live",
+          "scope": {
+            "tr": "Kanada’nın resmî yaptırım listesi: kişi, kuruluş ve programlar.",
+            "en": "Canada’s official sanctions list: persons, entities and programmes.",
+            "ar": "قائمة العقوبات الرسمية الكندية: الأشخاص والكيانات والبرامج."
+          }
+        },
+        {
+          "key": "list:ch",
+          "name": "İsviçre – SECO yaptırım listesi",
+          "url": "https://www.sesam.search.admin.ch/sesam-search-web/pages/downloadXmlGesamtliste.xhtml?lang=en&action=downloadXmlGesamtlisteAction",
+          "auto": "live",
+          "scope": {
+            "tr": "İsviçre’nin resmî yaptırım listesi; listeden çıkarılanlar dikkate alınmaz.",
+            "en": "Switzerland’s official sanctions list; delisted entries are ignored.",
+            "ar": "قائمة العقوبات الرسمية السويسرية؛ تُهمَل المدخلات المحذوفة."
+          }
+        },
+        {
+          "key": "news:fr",
+          "name": "ABD Federal Register – OFAC ve BIS duyuruları",
+          "url": "https://www.federalregister.gov/developers/documentation/api/v1",
+          "auto": "live",
+          "scope": {
+            "tr": "Resmî kayıtta yayımlanan ekleme, silme, lisans ve uygulama duyuruları.",
+            "en": "Additions, removals, licences and enforcement notices published in the Federal Register.",
+            "ar": "إعلانات الإضافة والحذف والتراخيص والإنفاذ المنشورة في السجل الفيدرالي."
+          }
+        },
+        {
+          "key": "news:rg",
+          "name": "Resmî Gazete – günlük içindekiler",
+          "url": "https://www.resmigazete.gov.tr/",
+          "auto": "live",
+          "scope": {
+            "tr": "Günlük içindekiler taranır; yaptırım, MASAK ve mal varlığı dondurma ile ilgili ilanlar öne çıkarılır.",
+            "en": "The daily table of contents is scanned; notices on sanctions, MASAK and asset freezing are highlighted.",
+            "ar": "يُفحص فهرس كل يوم وتُبرَز الإعلانات المتعلقة بالعقوبات وMASAK وتجميد الأصول."
+          }
+        },
+        {
+          "key": "list:au",
+          "name": "Avustralya – DFAT konsolide yaptırım listesi",
+          "url": "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list",
+          "auto": "live",
+          "scope": {
+            "tr": "Resmî Excel dosyası indirilir ve okunur; kayıtlar listeye işlenir.",
+            "en": "The official Excel file is downloaded and read; records are loaded into the list.",
+            "ar": "يُنزَّل ملف Excel الرسمي ويُقرأ وتُدرَج السجلات في القائمة."
+          }
+        },
+        {
+          "key": "list:jp",
+          "name": "Japonya – MOF varlık dondurma listesi",
+          "url": "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/list.html",
+          "auto": "live",
+          "scope": {
+            "tr": "Maliye Bakanlığı’nın güncel Excel dosyası bulunup okunur; İngilizce ad ve takma adlar kullanılır.",
+            "en": "The Ministry of Finance’s current Excel file is located and read; English names and aliases are used.",
+            "ar": "يُعثر على أحدث ملف Excel لوزارة المالية ويُقرأ؛ وتُستخدم الأسماء الإنجليزية والأسماء المستعارة."
+          }
+        },
+        {
+          "key": "list:ae",
+          "name": "BAE – Yerel Terör Listesi",
+          "url": "https://www.opensanctions.org/datasets/ae_local_terrorists/",
+          "auto": "live",
+          "scope": {
+            "tr": "BAE’nin yerel terör listesi; kurum makine tarafından okunabilir bir dosya yayımlamadığı için lisanslı bir veri ortağı üzerinden alınır.",
+            "en": "The UAE local terrorist list; the authority publishes no machine-readable file, so it comes through a licensed data partner.",
+            "ar": "قائمة الإرهاب المحلية في الإمارات؛ لا تنشر الجهة ملفًا يمكن قراءته آليًا لذا تُؤخذ عبر شريك بيانات مرخَّص."
+          }
+        },
+        {
+          "key": "list:qa",
+          "name": "Katar – Ulusal Terörle Mücadele Komitesi (NCTC) listesi",
+          "url": "https://www.opensanctions.org/datasets/qa_nctc_sanctions/",
+          "auto": "live",
+          "scope": {
+            "tr": "Katar’ın birleşik yaptırım kaydı; kurum makine tarafından okunabilir dosya yayımlamadığı için lisanslı veri ortağı üzerinden alınır.",
+            "en": "Qatar’s consolidated sanctions record; the committee publishes no machine-readable file, so it comes through a licensed data partner.",
+            "ar": "سجل العقوبات الموحّد في قطر؛ لا تنشر اللجنة ملفًا يمكن قراءته آليًا لذا يُؤخذ عبر شريك بيانات مرخَّص."
+          }
+        },
+        {
+          "key": "list:sa",
+          "name": "Suudi Arabistan – Ulusal Terör Listesi",
+          "url": "https://www.opensanctions.org/datasets/sa_pcct_terrorism_list/",
+          "auto": "live",
+          "scope": {
+            "tr": "Suudi Arabistan’ın ulusal terör listesi; lisanslı veri ortağı üzerinden alınır.",
+            "en": "Saudi Arabia’s national terrorism list; obtained through a licensed data partner.",
+            "ar": "قائمة الإرهاب الوطنية في السعودية؛ تُؤخذ عبر شريك بيانات مرخَّص."
+          }
+        },
+        {
+          "key": "pep",
+          "name": "Siyasi nüfuz sahibi kişiler (PEP)",
+          "url": "https://www.opensanctions.org/datasets/peps/",
+          "auto": "optional",
+          "scope": {
+            "tr": "Dünya genelinde PEP kayıtları. Yaptırım listesi değildir; ayrı bir kaynak ve “PEP” etiketiyle gösterilir. Büyük bir veri setidir ve lisanslı veri ortağı gerektirir.",
+            "en": "PEP records worldwide. Not a sanctions list; shown as a separate source tagged “PEP”. A large data set that needs a licensed data partner.",
+            "ar": "سجلات الأشخاص السياسيين ذوي النفوذ حول العالم. ليست قائمة عقوبات؛ تظهر كمصدر مستقل بوسم «PEP». مجموعة بيانات كبيرة تتطلب شريك بيانات مرخَّصًا."
+          }
+        },
+        {
+          "key": "os",
+          "name": "Yedek ve ek veri hizmeti (OpenSanctions)",
+          "url": "https://www.opensanctions.org/datasets/",
+          "auto": "optional",
+          "scope": {
+            "tr": "Resmî kaynak uzun süre alınamazsa yedek olarak kullanılabilir; ayrıca ek veri kümeleri eklenebilir. Ticari kullanımda veri sağlayıcının lisansı gerekir, bu nedenle lisans alınana kadar kapalı kalır ve sistem yöneticisi tarafından kurulum düzeyinde açılır.",
+            "en": "Can serve as a backup when an official source is unavailable for a long time, and can add extra data sets. Commercial use needs the data provider’s licence, so it stays off until a licence is obtained and is switched on by the system operator at installation level.",
+            "ar": "يمكن استخدامه كنسخة احتياطية عند تعذّر المصدر الرسمي لفترة طويلة، كما يمكن إضافة مجموعات بيانات إضافية. يتطلب الاستخدام التجاري ترخيص مزوّد البيانات، لذا يبقى مغلقًا حتى الحصول على الترخيص ويفعّله مشغّل النظام على مستوى التثبيت."
+          }
+        },
+        {
+          "key": "gdelt",
+          "name": "GDELT – olumsuz haber taraması",
+          "url": "https://www.gdeltproject.org/",
+          "auto": "optional",
+          "scope": {
+            "tr": "Kontrol ekranında isme göre dünya basınında olumsuz haber (yolsuzluk, kara para, yaptırım vb.) aranır. Arama yalnızca siz tıkladığınızda çalışır; aranan isim üçüncü tarafa iletilir. Müşteri listeleriniz bu yolla gönderilmez.",
+            "en": "On the Check screen, world media is searched by name for adverse news (corruption, laundering, sanctions and so on). It runs only when you click; the name searched is sent to a third party. Your customer lists are never sent this way.",
+            "ar": "في شاشة التحقق يُبحث بالاسم في الإعلام العالمي عن أخبار سلبية (فساد، غسل أموال، عقوبات وغيرها). يعمل فقط عند النقر؛ ويُرسل الاسم المبحوث عنه إلى جهة خارجية. لا تُرسل قوائم عملائكم بهذه الطريقة."
+          }
+        },
+        {
+          "key": "interpol",
+          "name": "Interpol – kırmızı bülten sorgusu",
+          "url": "https://www.interpol.int/How-we-work/Notices/Red-Notices",
+          "auto": "optional",
+          "scope": {
+            "tr": "Kontrol ekranında isme göre Interpol’ün herkese açık kırmızı bültenleri sorgulanır. Kapalı gelir; yönetici açabilir. Interpol istemciyi reddederse sonuç alınamaz ve elle sorgulama gerekir.",
+            "en": "On the Check screen, Interpol’s public red notices are searched by name. Off by default; an administrator can turn it on. If Interpol refuses the request no result is returned and a manual lookup is needed.",
+            "ar": "في شاشة التحقق تُستعلم نشرات الإنتربول الحمراء المتاحة للعموم بالاسم. مغلق افتراضيًا ويمكن للمسؤول تفعيله. إذا رفض الإنتربول الطلب فلن تُعاد نتيجة ويلزم البحث يدويًا."
+          }
+        }
+      ]
     },
     {
-     "key": "news:uk",
-     "name": "UK – Sanctions List duyuruları (GOV.UK)",
-     "url": "https://www.gov.uk/government/publications/the-uk-sanctions-list",
-     "auto": "live",
-     "scope": {
-      "tr": "Birleşik Krallık yaptırım duyuruları GOV.UK üzerinden izlenir. Tek resmî liste UK Sanctions List’tir (OFSI konsolide listesi 28 Ocak 2026’da kapandı).",
-      "en": "UK sanctions notices are followed on GOV.UK. The UK Sanctions List is the single official list (the OFSI consolidated list closed on 28 January 2026).",
-      "ar": "تُتابَع إعلانات العقوبات البريطانية عبر GOV.UK. قائمة UK Sanctions List هي القائمة الرسمية الوحيدة (أُغلقت قائمة OFSI الموحّدة في 28 يناير 2026)."
-     }
+      "id": "tr",
+      "tr": "Türkiye – yerel kaynaklar",
+      "en": "Türkiye – local sources",
+      "ar": "تركيا – المصادر المحلية",
+      "items": [
+        {
+          "key": "list:tr",
+          "name": "MASAK – Mal varlığı dondurma listeleri (6415 md.5/6/7, 7262 md.3A/3B)",
+          "url": "https://masak.hmb.gov.tr/bkk-ile-malvarliklari-dondurulanlar",
+          "auto": "live",
+          "scope": {
+            "tr": "MASAK’ın 6415 ve 7262 sayılı kanunlara göre yayımladığı mal varlığı dondurma listeleri düzenli olarak okunur ve değişiklik geçmişiyle saklanır.",
+            "en": "MASAK’s asset-freezing lists under Laws 6415 and 7262 are read regularly and kept with their change history.",
+            "ar": "تُقرأ بانتظام قوائم تجميد الأصول الصادرة عن MASAK وفق القانونين 6415 و7262 وتُحفظ مع سجل تغييراتها."
+          }
+        },
+        {
+          "key": "watch:masak,masak-posts,masak-rehber,masak-mevzuat,masak-yaptirim,bddk-duyuru,bddk-mevzuat,tcmb-duyuru,spk,kvkk",
+          "name": "Türkiye düzenleyici kurum duyuruları: MASAK, BDDK, TCMB, SPK, KVKK",
+          "url": "https://masak.hmb.gov.tr/bkk-ile-malvarliklari-dondurulanlar",
+          "auto": "live",
+          "scope": {
+            "tr": "MASAK duyuru, rehber, mevzuat ve yaptırım sayfaları ile BDDK, TCMB, SPK ve KVKK duyuruları izlenir; yeni bir duyuru ya da değişiklik çıktığında uyarı verilir.",
+            "en": "MASAK announcement, guidance, legislation and sanctions pages and BDDK, TCMB, SPK and KVKK announcements are monitored; you are alerted when something new or changed appears.",
+            "ar": "تُراقَب صفحات إعلانات MASAK وإرشاداتها وتشريعاتها وعقوباتها وإعلانات BDDK وTCMB وSPK وKVKK، ويُرسَل تنبيه عند ظهور إعلان جديد أو تغيير."
+          }
+        },
+        {
+          "key": "news:rg",
+          "name": "Resmî Gazete",
+          "url": "https://www.resmigazete.gov.tr/",
+          "auto": "live",
+          "scope": {
+            "tr": "Dondurma ve kaldırma kararları Resmî Gazete’de ilan edilir; yaptırım ve MASAK ile ilgili başlıklar günlük içindekilerden ayıklanır.",
+            "en": "Freezing and unfreezing decisions are published in the Official Gazette; headings related to sanctions and MASAK are picked from the daily contents.",
+            "ar": "تُنشر قرارات التجميد والرفع في الجريدة الرسمية؛ وتُستخلص العناوين المتعلقة بالعقوبات وMASAK من الفهرس اليومي."
+          }
+        }
+      ]
     },
     {
-     "key": "list:uk",
-     "name": "UK Sanctions List (ana liste)",
-     "url": "https://www.gov.uk/government/publications/the-uk-sanctions-list",
-     "auto": "live",
-     "scope": {
-      "tr": "Yeni kişi, kuruluş ve gemi eklemeleri, çıkarmalar ve kayıt değişiklikleri günlük izlenir.",
-      "en": "New persons, entities and vessels, removals and record changes are tracked daily.",
-      "ar": "تُتابَع يوميًا الإضافات الجديدة للأشخاص والكيانات والسفن وعمليات الحذف وتغييرات السجلات."
-     }
+      "id": "regulators",
+      "tr": "Körfez ve diğer düzenleyici kurumlar (sayfa izleme)",
+      "en": "Gulf and other regulators (page monitoring)",
+      "ar": "الجهات التنظيمية في الخليج وغيرها (مراقبة الصفحات)",
+      "items": [
+        {
+          "key": "watch:eocn,cbuae,dfsa,fsra",
+          "name": "BAE – EOCN, Merkez Bankası (CBUAE), DFSA, FSRA",
+          "url": "https://www.uaeiec.gov.ae/en-us/un-page",
+          "auto": "live",
+          "scope": {
+            "tr": "Yürütme Ofisi’nin yerel terör listesi ve BM listesi sayfası ile Merkez Bankası, DFSA ve FSRA duyuruları izlenir. Bu kurumlar makine tarafından okunabilir liste yayımlamaz; değişiklik olduğunda uyarı verilir.",
+            "en": "The Executive Office’s local terrorist list and UN list page and announcements from the Central Bank, DFSA and FSRA are monitored. These bodies publish no machine-readable list; you are alerted when something changes.",
+            "ar": "تُراقَب صفحة المكتب التنفيذي لقائمة الإرهاب المحلية وقائمة الأمم المتحدة، وإعلانات المصرف المركزي وDFSA وFSRA. لا تنشر هذه الجهات قائمة يمكن قراءتها آليًا؛ يُرسَل تنبيه عند حدوث تغيير."
+          }
+        },
+        {
+          "key": "watch:sama",
+          "name": "Suudi Arabistan – Merkez Bankası (SAMA)",
+          "url": "https://www.sama.gov.sa/",
+          "auto": "live",
+          "scope": {
+            "tr": "SAMA duyuruları izlenir; değişiklik olduğunda uyarı verilir.",
+            "en": "SAMA announcements are monitored; you are alerted when something changes.",
+            "ar": "تُراقَب إعلانات ساما؛ ويُرسَل تنبيه عند حدوث تغيير."
+          }
+        },
+        {
+          "key": "watch:nctc,qcb,qfcra",
+          "name": "Katar – NCTC, Merkez Bankası (QCB), QFCRA",
+          "url": "https://www.nctc.gov.qa/",
+          "auto": "live",
+          "scope": {
+            "tr": "Ulusal Terörle Mücadele Komitesi’nin yerel listesi ile Merkez Bankası ve QFCRA duyuruları izlenir.",
+            "en": "The National Counter Terrorism Committee’s local list and announcements from the Central Bank and QFCRA are monitored.",
+            "ar": "تُراقَب القائمة المحلية للجنة الوطنية لمكافحة الإرهاب وإعلانات مصرف قطر المركزي وQFCRA."
+          }
+        },
+        {
+          "key": "watch:cbb",
+          "name": "Bahreyn – Merkez Bankası (CBB)",
+          "url": "https://www.cbb.gov.bh/",
+          "auto": "live",
+          "scope": {
+            "tr": "Bahreyn için makine tarafından okunabilir bir kamu yaptırım listesi yoktur; yalnızca resmî sayfa izlenir ve değişiklikte uyarı verilir. İsim eşleştirmesi yapılmaz.",
+            "en": "Bahrain has no machine-readable public sanctions list; only the official page is monitored and you are alerted on change. No name matching is performed.",
+            "ar": "لا توجد قائمة عقوبات عامة يمكن قراءتها آليًا في البحرين؛ تُراقَب الصفحة الرسمية فقط ويُرسَل تنبيه عند التغيير. لا تُجرى مطابقة للأسماء."
+          }
+        },
+        {
+          "key": "watch:cbk",
+          "name": "Kuveyt – Merkez Bankası (CBK)",
+          "url": "https://www.cbk.gov.kw/en/",
+          "auto": "live",
+          "scope": {
+            "tr": "Kuveyt Merkez Bankası duyuruları izlenir.",
+            "en": "Central Bank of Kuwait announcements are monitored.",
+            "ar": "تُراقَب إعلانات بنك الكويت المركزي."
+          }
+        },
+        {
+          "key": "watch:cbo",
+          "name": "Umman – Merkez Bankası (CBO)",
+          "url": "https://www.cbo.gov.om/",
+          "auto": "live",
+          "scope": {
+            "tr": "Umman Merkez Bankası duyuruları izlenir.",
+            "en": "Central Bank of Oman announcements are monitored.",
+            "ar": "تُراقَب إعلانات البنك المركزي العماني."
+          }
+        },
+        {
+          "key": "watch:dfat,mof",
+          "name": "Avustralya DFAT ve Japonya MOF – resmî sayfalar",
+          "url": "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list",
+          "auto": "live",
+          "scope": {
+            "tr": "Liste dosyalarına ek olarak iki kurumun resmî sayfaları da izlenir; sayfa değişirse uyarı verilir.",
+            "en": "In addition to the list files, the two authorities’ official pages are monitored; you are alerted if a page changes.",
+            "ar": "إضافة إلى ملفات القوائم تُراقَب الصفحات الرسمية للجهتين؛ ويُرسَل تنبيه إذا تغيّرت صفحة."
+          }
+        }
+      ]
     },
     {
-     "key": null,
-     "name": "UK Sanctions List Search",
-     "url": "https://search-uk-sanctions-list.service.gov.uk/",
-     "auto": "link",
-     "scope": {
-      "tr": "Belirli bir kişi, kuruluş veya gemi için resmî arama sayfası.",
-      "en": "Official search page for a specific person, entity or vessel.",
-      "ar": "صفحة البحث الرسمية عن شخص أو كيان أو سفينة محددة."
-     }
+      "id": "trade",
+      "tr": "Ticaret, gemi ve mevzuat",
+      "en": "Trade, vessels and legislation",
+      "ar": "التجارة والسفن والتشريعات",
+      "items": [
+        {
+          "key": null,
+          "name": "TARIC (AB)",
+          "url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+          "auto": "link",
+          "scope": {
+            "tr": "GTİP/CN koduna göre tarife ve ticaret tedbirleri.",
+            "en": "Tariff and trade measures by customs / CN code.",
+            "ar": "التعرفة وتدابير التجارة بحسب الرمز الجمركي / CN."
+          }
+        },
+        {
+          "key": null,
+          "name": "AB Reg. 833/2014 (konsolide) + Reg. 2022/428",
+          "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022R0428",
+          "auto": "data",
+          "scope": {
+            "tr": "Yasaklı ürün ekleri uygulamada tutulur; GTİP’in ilk 4 hanesiyle aranır ve dayanak madde gösterilir.",
+            "en": "The prohibited-goods annexes are kept in the application; searched by the first four digits of the customs code, with the legal basis shown.",
+            "ar": "تُحفظ ملاحق السلع المحظورة داخل التطبيق؛ يُبحث بالأرقام الأربعة الأولى من الرمز الجمركي ويُعرض السند القانوني."
+          }
+        },
+        {
+          "key": null,
+          "name": "AB Reg. 2021/821 (çift kullanımlı ürünler)",
+          "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02021R0821-20241108",
+          "auto": "link",
+          "scope": {
+            "tr": "Ek I kontrol listesi (kategori kodlu; GTİP kodu değildir).",
+            "en": "Annex I control list (category codes; not customs codes).",
+            "ar": "قائمة الرقابة في الملحق I (برموز فئات وليست رموزًا جمركية)."
+          }
+        },
+        {
+          "key": null,
+          "name": "VesselFinder (IMO)",
+          "url": "https://www.vesselfinder.com/tr/vessels/details/9244192",
+          "auto": "link",
+          "scope": {
+            "tr": "IMO numarası ile gemi bayrağı, sahip ve konum bilgisi.",
+            "en": "Vessel flag, owner and position by IMO number.",
+            "ar": "علم السفينة ومالكها وموقعها بحسب رقم IMO."
+          }
+        },
+        {
+          "key": null,
+          "name": "Seasearcher (S&P Global)",
+          "url": "https://www.seasearcher.com/vessels/",
+          "auto": "external",
+          "scope": {
+            "tr": "Lisanslı gemi ve ticaret verisi; kurumun kendi aboneliğiyle kullanılır.",
+            "en": "Licensed vessel and trade data; used with the institution’s own subscription.",
+            "ar": "بيانات سفن وتجارة مرخَّصة؛ تُستخدم باشتراك المؤسسة نفسها."
+          }
+        },
+        {
+          "key": null,
+          "name": "Türkiye sınır kapıları",
+          "url": "https://www.udybelgesi.com/turkiye-sinir-kapilari.asp",
+          "auto": "data",
+          "scope": {
+            "tr": "Kara sınır kapıları için başvuru tablosu uygulama içinde bulunur.",
+            "en": "A reference table of land border crossings is built into the application.",
+            "ar": "جدول مرجعي للمعابر الحدودية البرية مُدمج في التطبيق."
+          }
+        }
+      ]
     },
     {
-     "key": null,
-     "name": "Russia – Designations and Sanctions Notices",
-     "url": "https://www.gov.uk/guidance/russia-list-of-designations-and-sanctions-notices",
-     "auto": "link",
-     "scope": {
-      "tr": "Rusya yaptırım rejiminde yayımlanan yeni karar ve duyurular.",
-      "en": "New decisions and notices under the Russia sanctions regime.",
-      "ar": "القرارات والإعلانات الجديدة ضمن نظام العقوبات المتعلق بروسيا."
-     }
+      "id": "licensed",
+      "tr": "Lisanslı araçlar (kurumun kendi lisansıyla)",
+      "en": "Licensed tools (with the institution’s own licence)",
+      "ar": "أدوات مرخَّصة (بترخيص المؤسسة نفسها)",
+      "items": [
+        {
+          "key": "byol",
+          "name": "Kendi lisanslı veri ortağınız (BYOL)",
+          "url": "",
+          "auto": true,
+          "scope": {
+            "tr": "Kendi aboneliğiniz olan veri sağlayıcısının (OpenSanctions, Dow Jones, World-Check, Bridger, Orbis, ComplyAdvantage, Sayari veya özel bir servis) kimlik bilgilerini girerek verisini müşteri taramasına katın. Yönetim → Lisanslı veri ortakları ekranından yönetici açar.",
+            "en": "Connect your own data-provider subscription (OpenSanctions, Dow Jones, World-Check, Bridger, Orbis, ComplyAdvantage, Sayari or a custom service) and add its data to customer screening. An administrator sets it up under Administration → Licensed data partners.",
+            "ar": "اربط اشتراكك الخاص لدى مزوّد البيانات (OpenSanctions أو Dow Jones أو World-Check أو Bridger أو Orbis أو ComplyAdvantage أو Sayari أو خدمة مخصصة) لإضافة بياناته إلى فحص العملاء. يقوم المسؤول بالإعداد من الإدارة ← شركاء البيانات المرخّصة."
+          }
+        },
+        {
+          "key": null,
+          "name": "World-Check (Refinitiv)",
+          "url": "https://worldcheck.refinitiv.com/",
+          "auto": "external",
+          "scope": {
+            "tr": "Kişi ve kuruluş taraması, PEP ve olumsuz medya.",
+            "en": "Person and entity screening, PEP and adverse media.",
+            "ar": "فحص الأشخاص والكيانات وPEP والأخبار السلبية."
+          }
+        },
+        {
+          "key": null,
+          "name": "Spark Interfax",
+          "url": "https://spark-interfax.ru/system#/dashboard",
+          "auto": "external",
+          "scope": {
+            "tr": "Rus şirketleri: sahiplik, yöneticiler ve mali tablolar.",
+            "en": "Russian companies: ownership, directors and financials.",
+            "ar": "الشركات الروسية: الملكية والمديرون والقوائم المالية."
+          }
+        },
+        {
+          "key": null,
+          "name": "Bankers Almanac (LexisNexis Risk)",
+          "url": "https://bankersalmanac.lexisnexisrisk.com/home",
+          "auto": "external",
+          "scope": {
+            "tr": "Banka ve muhabir banka bilgileri, SWIFT/BIC ve ortaklıklar.",
+            "en": "Bank and correspondent bank details, SWIFT/BIC and ownership.",
+            "ar": "بيانات البنوك والبنوك المراسلة وSWIFT/BIC والملكية."
+          }
+        },
+        {
+          "key": null,
+          "name": "Seasearcher",
+          "url": "https://www.seasearcher.com/vessels/",
+          "auto": "external",
+          "scope": {
+            "tr": "Gemi geçmişi ve sahiplik bilgisi.",
+            "en": "Vessel history and ownership.",
+            "ar": "تاريخ السفن وملكيتها."
+          }
+        }
+      ]
     },
     {
-     "key": "news:uk",
-     "name": "OFSI General Licences",
-     "url": "https://www.gov.uk/government/collections/ofsi-general-licences",
-     "auto": "live",
-     "scope": {
-      "tr": "Yeni genel lisans (General Licence) yayımları; seyrek yayımlanır.",
-      "en": "New general licences; published infrequently.",
-      "ar": "التراخيص العامة الجديدة؛ تُنشر بشكل متباعد."
-     }
-    },
-    {
-     "key": "news:uk",
-     "name": "OFSI Enforcement / Monetary Penalties",
-     "url": "https://www.gov.uk/government/collections/enforcement-of-financial-sanctions",
-     "auto": "live",
-     "scope": {
-      "tr": "Para cezaları, uzlaşmalar ve uygulama kararları; bilgi amaçlıdır.",
-      "en": "Monetary penalties, settlements and enforcement actions; for information.",
-      "ar": "الغرامات والتسويات وإجراءات الإنفاذ؛ للاطلاع."
-     }
-    },
-    {
-     "key": null,
-     "name": "OFSI ana sayfa",
-     "url": "https://www.gov.uk/government/organisations/office-of-financial-sanctions-implementation",
-     "auto": "link",
-     "scope": {
-      "tr": "Rehberler, duyurular ve önemli güncellemeler.",
-      "en": "Guidance, announcements and key updates.",
-      "ar": "الإرشادات والإعلانات وأهم المستجدات."
-     }
-    },
-    {
-     "key": null,
-     "name": "Current UK sanctions regimes",
-     "url": "https://www.gov.uk/government/collections/uk-sanctions",
-     "auto": "link",
-     "scope": {
-      "tr": "Ülke bazlı rejimler ve mevzuat değişiklikleri.",
-      "en": "Country regimes and legislative changes.",
-      "ar": "أنظمة العقوبات حسب الدولة والتغييرات التشريعية."
-     }
-    },
-    {
-     "key": "news:eu",
-     "name": "AB – Resmî Gazete (EUR-Lex, L serisi)",
-     "url": "https://eur-lex.europa.eu/oj/direct-access.html",
-     "auto": "live",
-     "scope": {
-      "tr": "AB Resmî Gazetesi’nin mevzuat bölümü; bakılan gün ve bir önceki gün taranır.",
-      "en": "The legislation section of the EU Official Journal; the current and previous day are scanned.",
-      "ar": "قسم التشريعات في الجريدة الرسمية للاتحاد الأوروبي؛ يُفحص اليوم الحالي واليوم السابق."
-     }
-    },
-    {
-     "key": "list:eu",
-     "name": "AB – Konsolide finansal yaptırım listesi",
-     "url": "https://www.sanctionsmap.eu/",
-     "auto": "live",
-     "scope": {
-      "tr": "AB’nin kişi ve kuruluş listesi; isim ve IMO numarası ile aranabilir.",
-      "en": "The EU list of persons and entities; searchable by name and IMO number.",
-      "ar": "قائمة الاتحاد الأوروبي للأشخاص والكيانات؛ يمكن البحث بالاسم ورقم IMO."
-     }
-    },
-    {
-     "key": "news:un",
-     "name": "BM Güvenlik Konseyi – basın duyuruları",
-     "url": "https://press.un.org/en/content/security-council",
-     "auto": "live",
-     "scope": {
-      "tr": "Listeye ekleme veya çıkarma içeren duyurular öne çıkarılır; silinme (çıkarma) olursa ayrıca dikkat çekilir.",
-      "en": "Notices about additions or removals are highlighted; removals get extra attention.",
-      "ar": "تُبرَز الإعلانات المتعلقة بالإضافة أو الحذف من القائمة، وتحظى حالات الحذف باهتمام إضافي."
-     }
-    },
-    {
-     "key": "list:un",
-     "name": "BM Konsolide Yaptırım Listesi",
-     "url": "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list",
-     "auto": "live",
-     "scope": {
-      "tr": "BM Güvenlik Konseyi’nin konsolide listesi düzenli olarak indirilir.",
-      "en": "The UN Security Council consolidated list is downloaded regularly.",
-      "ar": "تُنزَّل القائمة الموحّدة لمجلس الأمن الدولي بانتظام."
-     }
-    },
-    {
-     "key": "news:fatf",
-     "name": "FATF – kara ve gri listeler",
-     "url": "https://www.fatf-gafi.org/en/countries/black-and-grey-lists.html",
-     "auto": "live",
-     "scope": {
-      "tr": "Yılda üç genel kurul sonrasında güncellenir; ülke tablosu uygulama içinde tutulur.",
-      "en": "Updated after the three plenaries each year; the country table is kept inside the application.",
-      "ar": "تُحدَّث بعد الاجتماعات العامة الثلاثة كل عام؛ ويُحتفظ بجدول الدول داخل التطبيق."
-     }
-    },
-    {
-     "key": null,
-     "name": "FATF – Publications",
-     "url": "http://www.fatf-gafi.org/",
-     "auto": "link",
-     "scope": {
-      "tr": "FATF yayınları ve haberler.",
-      "en": "FATF publications and news.",
-      "ar": "منشورات FATF وأخبارها."
-     }
-    },
-    {
-     "key": "info",
-     "name": "ABD Dışişleri – Basın bültenleri",
-     "url": "https://www.state.gov/press-releases/",
-     "auto": "info",
-     "scope": {
-      "tr": "Bültene dahil edilmez; yalnızca bilgi amacıyla okunur.",
-      "en": "Not included in the bulletin; read for information only.",
-      "ar": "لا تدخل في النشرة؛ تُقرأ للاطلاع فقط."
-     }
+      "id": "apis",
+      "tr": "Resmî veri hizmetleri (teknik kaynaklar)",
+      "en": "Official data services (technical sources)",
+      "ar": "خدمات البيانات الرسمية (المصادر التقنية)",
+      "items": [
+        {
+          "key": "list:ofac",
+          "name": "OFAC Sanctions List Service",
+          "url": "https://sanctionslist.ofac.treas.gov/Home/SdnList",
+          "auto": "live",
+          "scope": {
+            "tr": "OFAC’ın resmî indirme hizmeti; SDN listesi ve değişiklikler buradan alınır.",
+            "en": "OFAC’s official download service; the SDN list and its changes come from here.",
+            "ar": "خدمة التنزيل الرسمية لـ OFAC؛ تُؤخذ منها قائمة SDN وتغييراتها."
+          }
+        },
+        {
+          "key": "list:eu",
+          "name": "AB Financial Sanctions Files",
+          "url": "https://finance.ec.europa.eu/eu-and-world/sanctions-restrictive-measures/overview-sanctions-and-related-resources_en",
+          "auto": "live",
+          "scope": {
+            "tr": "AB’nin konsolide yaptırım dosyaları.",
+            "en": "The EU’s consolidated sanctions files.",
+            "ar": "ملفات العقوبات الموحّدة للاتحاد الأوروبي."
+          }
+        },
+        {
+          "key": "list:un",
+          "name": "BM Güvenlik Konseyi konsolide listesi (XML)",
+          "url": "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list",
+          "auto": "live",
+          "scope": {
+            "tr": "Konsolide liste dosyası düzenli olarak indirilir.",
+            "en": "The consolidated list file is downloaded regularly.",
+            "ar": "يُنزَّل ملف القائمة الموحّدة بانتظام."
+          }
+        },
+        {
+          "key": "news:eu",
+          "name": "AB Resmî Gazete (L serisi) yayınları",
+          "url": "https://eur-lex.europa.eu/EN/display-feed.rss?rssId=222",
+          "auto": "live",
+          "scope": {
+            "tr": "AB Resmî Gazetesi’nde yayımlanan yeni düzenlemeler.",
+            "en": "New acts published in the EU Official Journal.",
+            "ar": "التشريعات الجديدة المنشورة في الجريدة الرسمية للاتحاد الأوروبي."
+          }
+        },
+        {
+          "key": "news:fr",
+          "name": "ABD Federal Register (OFAC bildirimleri)",
+          "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=foreign-assets-control-office",
+          "auto": "live",
+          "scope": {
+            "tr": "Yasal bildirim metinleri; OFAC duyuru sayfasına tamamlayıcıdır.",
+            "en": "Legal notice texts; complements the OFAC announcements page.",
+            "ar": "نصوص الإشعارات القانونية؛ تكمل صفحة إعلانات OFAC."
+          }
+        },
+        {
+          "key": null,
+          "name": "AB Yaptırım Haritası",
+          "url": "https://www.sanctionsmap.eu/",
+          "auto": "link",
+          "scope": {
+            "tr": "Rejim düzeyinde hukuki metinler (ticaret, seyahat ve sektörel tedbirler dahil).",
+            "en": "Legal texts by regime (including trade, travel and sectoral measures).",
+            "ar": "النصوص القانونية بحسب النظام (بما فيها تدابير التجارة والسفر والقطاعات)."
+          }
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "global",
-   "tr": "Küresel ve bölgesel listeler",
-   "en": "Global and regional lists",
-   "ar": "القوائم العالمية والإقليمية",
-   "items": [
-    {
-     "key": "list:ofacc",
-     "name": "OFAC – Konsolide (SDN dışı) liste",
-     "url": "https://sanctionslistservice.ofac.treas.gov/api/download/CONS_PRIM.CSV",
-     "auto": "live",
-     "scope": {
-      "tr": "SSI, NS-MBS ve benzeri SDN dışı OFAC listeleri.",
-      "en": "SSI, NS-MBS and other non-SDN OFAC lists.",
-      "ar": "قوائم OFAC من خارج SDN مثل SSI وNS-MBS."
-     }
-    },
-    {
-     "key": "list:csl",
-     "name": "ABD – Consolidated Screening List (BIS, Entity List vb.)",
-     "url": "https://data.trade.gov/downloadable_consolidated_screening_list/v1/consolidated.csv",
-     "auto": "live",
-     "scope": {
-      "tr": "BIS Entity List, Denied Persons, Unverified ve MEU listeleri ile ABD Dışişleri kayıtları. Varsayılan olarak kapalıdır; yönetici Yönetim → Listeler ekranından açar.",
-      "en": "BIS Entity List, Denied Persons, Unverified and MEU lists plus US State Department records. Off by default; an administrator turns it on under Administration → Lists.",
-      "ar": "قوائم BIS (Entity List وDenied Persons وUnverified وMEU) وسجلات وزارة الخارجية الأمريكية. مغلقة افتراضيًا؛ يفعّلها المسؤول من الإدارة ← القوائم."
-     }
-    },
-    {
-     "key": "list:ca",
-     "name": "Kanada – SEMA yaptırım listesi",
-     "url": "https://www.international.gc.ca/world-monde/assets/office_docs/international_relations-relations_internationales/sanctions/sema-lmes.xml",
-     "auto": "live",
-     "scope": {
-      "tr": "Kanada’nın resmî yaptırım listesi: kişi, kuruluş ve programlar.",
-      "en": "Canada’s official sanctions list: persons, entities and programmes.",
-      "ar": "قائمة العقوبات الرسمية الكندية: الأشخاص والكيانات والبرامج."
-     }
-    },
-    {
-     "key": "list:ch",
-     "name": "İsviçre – SECO yaptırım listesi",
-     "url": "https://www.sesam.search.admin.ch/sesam-search-web/pages/downloadXmlGesamtliste.xhtml?lang=en&action=downloadXmlGesamtlisteAction",
-     "auto": "live",
-     "scope": {
-      "tr": "İsviçre’nin resmî yaptırım listesi; listeden çıkarılanlar dikkate alınmaz.",
-      "en": "Switzerland’s official sanctions list; delisted entries are ignored.",
-      "ar": "قائمة العقوبات الرسمية السويسرية؛ تُهمَل المدخلات المحذوفة."
-     }
-    },
-    {
-     "key": "news:fr",
-     "name": "ABD Federal Register – OFAC ve BIS duyuruları",
-     "url": "https://www.federalregister.gov/developers/documentation/api/v1",
-     "auto": "live",
-     "scope": {
-      "tr": "Resmî kayıtta yayımlanan ekleme, silme, lisans ve uygulama duyuruları.",
-      "en": "Additions, removals, licences and enforcement notices published in the Federal Register.",
-      "ar": "إعلانات الإضافة والحذف والتراخيص والإنفاذ المنشورة في السجل الفيدرالي."
-     }
-    },
-    {
-     "key": "news:rg",
-     "name": "Resmî Gazete – günlük içindekiler",
-     "url": "https://www.resmigazete.gov.tr/",
-     "auto": "live",
-     "scope": {
-      "tr": "Günlük içindekiler taranır; yaptırım, MASAK ve mal varlığı dondurma ile ilgili ilanlar öne çıkarılır.",
-      "en": "The daily table of contents is scanned; notices on sanctions, MASAK and asset freezing are highlighted.",
-      "ar": "يُفحص فهرس كل يوم وتُبرَز الإعلانات المتعلقة بالعقوبات وMASAK وتجميد الأصول."
-     }
-    },
-    {
-     "key": "list:au",
-     "name": "Avustralya – DFAT konsolide yaptırım listesi",
-     "url": "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list",
-     "auto": "live",
-     "scope": {
-      "tr": "Resmî Excel dosyası indirilir ve okunur; kayıtlar listeye işlenir.",
-      "en": "The official Excel file is downloaded and read; records are loaded into the list.",
-      "ar": "يُنزَّل ملف Excel الرسمي ويُقرأ وتُدرَج السجلات في القائمة."
-     }
-    },
-    {
-     "key": "list:jp",
-     "name": "Japonya – MOF varlık dondurma listesi",
-     "url": "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/list.html",
-     "auto": "live",
-     "scope": {
-      "tr": "Maliye Bakanlığı’nın güncel Excel dosyası bulunup okunur; İngilizce ad ve takma adlar kullanılır.",
-      "en": "The Ministry of Finance’s current Excel file is located and read; English names and aliases are used.",
-      "ar": "يُعثر على أحدث ملف Excel لوزارة المالية ويُقرأ؛ وتُستخدم الأسماء الإنجليزية والأسماء المستعارة."
-     }
-    },
-    {
-     "key": "list:ae",
-     "name": "BAE – Yerel Terör Listesi",
-     "url": "https://www.opensanctions.org/datasets/ae_local_terrorists/",
-     "auto": "live",
-     "scope": {
-      "tr": "BAE’nin yerel terör listesi; kurum makine tarafından okunabilir bir dosya yayımlamadığı için lisanslı bir veri ortağı üzerinden alınır.",
-      "en": "The UAE local terrorist list; the authority publishes no machine-readable file, so it comes through a licensed data partner.",
-      "ar": "قائمة الإرهاب المحلية في الإمارات؛ لا تنشر الجهة ملفًا يمكن قراءته آليًا لذا تُؤخذ عبر شريك بيانات مرخَّص."
-     }
-    },
-    {
-     "key": "list:qa",
-     "name": "Katar – Ulusal Terörle Mücadele Komitesi (NCTC) listesi",
-     "url": "https://www.opensanctions.org/datasets/qa_nctc_sanctions/",
-     "auto": "live",
-     "scope": {
-      "tr": "Katar’ın birleşik yaptırım kaydı; kurum makine tarafından okunabilir dosya yayımlamadığı için lisanslı veri ortağı üzerinden alınır.",
-      "en": "Qatar’s consolidated sanctions record; the committee publishes no machine-readable file, so it comes through a licensed data partner.",
-      "ar": "سجل العقوبات الموحّد في قطر؛ لا تنشر اللجنة ملفًا يمكن قراءته آليًا لذا يُؤخذ عبر شريك بيانات مرخَّص."
-     }
-    },
-    {
-     "key": "list:sa",
-     "name": "Suudi Arabistan – Ulusal Terör Listesi",
-     "url": "https://www.opensanctions.org/datasets/sa_pcct_terrorism_list/",
-     "auto": "live",
-     "scope": {
-      "tr": "Suudi Arabistan’ın ulusal terör listesi; lisanslı veri ortağı üzerinden alınır.",
-      "en": "Saudi Arabia’s national terrorism list; obtained through a licensed data partner.",
-      "ar": "قائمة الإرهاب الوطنية في السعودية؛ تُؤخذ عبر شريك بيانات مرخَّص."
-     }
-    },
-    {
-     "key": "pep",
-     "name": "Siyasi nüfuz sahibi kişiler (PEP)",
-     "url": "https://www.opensanctions.org/datasets/peps/",
-     "auto": "optional",
-     "scope": {
-      "tr": "Dünya genelinde PEP kayıtları. Yaptırım listesi değildir; ayrı bir kaynak ve “PEP” etiketiyle gösterilir. Büyük bir veri setidir ve lisanslı veri ortağı gerektirir.",
-      "en": "PEP records worldwide. Not a sanctions list; shown as a separate source tagged “PEP”. A large data set that needs a licensed data partner.",
-      "ar": "سجلات الأشخاص السياسيين ذوي النفوذ حول العالم. ليست قائمة عقوبات؛ تظهر كمصدر مستقل بوسم «PEP». مجموعة بيانات كبيرة تتطلب شريك بيانات مرخَّصًا."
-     }
-    },
-    {
-     "key": "os",
-     "name": "Yedek ve ek veri hizmeti (OpenSanctions)",
-     "url": "https://www.opensanctions.org/datasets/",
-     "auto": "optional",
-     "scope": {
-      "tr": "Resmî kaynak uzun süre alınamazsa yedek olarak kullanılabilir; ayrıca ek veri kümeleri eklenebilir. Ticari kullanımda veri sağlayıcının lisansı gerekir, bu nedenle lisans alınana kadar kapalı kalır ve sistem yöneticisi tarafından kurulum düzeyinde açılır.",
-      "en": "Can serve as a backup when an official source is unavailable for a long time, and can add extra data sets. Commercial use needs the data provider’s licence, so it stays off until a licence is obtained and is switched on by the system operator at installation level.",
-      "ar": "يمكن استخدامه كنسخة احتياطية عند تعذّر المصدر الرسمي لفترة طويلة، كما يمكن إضافة مجموعات بيانات إضافية. يتطلب الاستخدام التجاري ترخيص مزوّد البيانات، لذا يبقى مغلقًا حتى الحصول على الترخيص ويفعّله مشغّل النظام على مستوى التثبيت."
-     }
-    },
-    {
-     "key": "gdelt",
-     "name": "GDELT – olumsuz haber taraması",
-     "url": "https://www.gdeltproject.org/",
-     "auto": "optional",
-     "scope": {
-      "tr": "Kontrol ekranında isme göre dünya basınında olumsuz haber (yolsuzluk, kara para, yaptırım vb.) aranır. Arama yalnızca siz tıkladığınızda çalışır; aranan isim üçüncü tarafa iletilir. Müşteri listeleriniz bu yolla gönderilmez.",
-      "en": "On the Check screen, world media is searched by name for adverse news (corruption, laundering, sanctions and so on). It runs only when you click; the name searched is sent to a third party. Your customer lists are never sent this way.",
-      "ar": "في شاشة التحقق يُبحث بالاسم في الإعلام العالمي عن أخبار سلبية (فساد، غسل أموال، عقوبات وغيرها). يعمل فقط عند النقر؛ ويُرسل الاسم المبحوث عنه إلى جهة خارجية. لا تُرسل قوائم عملائكم بهذه الطريقة."
-     }
-    },
-    {
-     "key": "interpol",
-     "name": "Interpol – kırmızı bülten sorgusu",
-     "url": "https://www.interpol.int/How-we-work/Notices/Red-Notices",
-     "auto": "optional",
-     "scope": {
-      "tr": "Kontrol ekranında isme göre Interpol’ün herkese açık kırmızı bültenleri sorgulanır. Kapalı gelir; yönetici açabilir. Interpol istemciyi reddederse sonuç alınamaz ve elle sorgulama gerekir.",
-      "en": "On the Check screen, Interpol’s public red notices are searched by name. Off by default; an administrator can turn it on. If Interpol refuses the request no result is returned and a manual lookup is needed.",
-      "ar": "في شاشة التحقق تُستعلم نشرات الإنتربول الحمراء المتاحة للعموم بالاسم. مغلق افتراضيًا ويمكن للمسؤول تفعيله. إذا رفض الإنتربول الطلب فلن تُعاد نتيجة ويلزم البحث يدويًا."
-     }
-    }
-   ]
-  },
-  {
-   "id": "tr",
-   "tr": "Türkiye – yerel kaynaklar",
-   "en": "Türkiye – local sources",
-   "ar": "تركيا – المصادر المحلية",
-   "items": [
-    {
-     "key": "list:tr",
-     "name": "MASAK – Mal varlığı dondurma listeleri (6415 md.5/6/7, 7262 md.3A/3B)",
-     "url": "https://masak.hmb.gov.tr/bkk-ile-malvarliklari-dondurulanlar",
-     "auto": "live",
-     "scope": {
-      "tr": "MASAK’ın 6415 ve 7262 sayılı kanunlara göre yayımladığı mal varlığı dondurma listeleri düzenli olarak okunur ve değişiklik geçmişiyle saklanır.",
-      "en": "MASAK’s asset-freezing lists under Laws 6415 and 7262 are read regularly and kept with their change history.",
-      "ar": "تُقرأ بانتظام قوائم تجميد الأصول الصادرة عن MASAK وفق القانونين 6415 و7262 وتُحفظ مع سجل تغييراتها."
-     }
-    },
-    {
-     "key": "watch:masak,masak-posts,masak-rehber,masak-mevzuat,masak-yaptirim,bddk-duyuru,bddk-mevzuat,tcmb-duyuru,spk,kvkk",
-     "name": "Türkiye düzenleyici kurum duyuruları: MASAK, BDDK, TCMB, SPK, KVKK",
-     "url": "https://masak.hmb.gov.tr/bkk-ile-malvarliklari-dondurulanlar",
-     "auto": "live",
-     "scope": {
-      "tr": "MASAK duyuru, rehber, mevzuat ve yaptırım sayfaları ile BDDK, TCMB, SPK ve KVKK duyuruları izlenir; yeni bir duyuru ya da değişiklik çıktığında uyarı verilir.",
-      "en": "MASAK announcement, guidance, legislation and sanctions pages and BDDK, TCMB, SPK and KVKK announcements are monitored; you are alerted when something new or changed appears.",
-      "ar": "تُراقَب صفحات إعلانات MASAK وإرشاداتها وتشريعاتها وعقوباتها وإعلانات BDDK وTCMB وSPK وKVKK، ويُرسَل تنبيه عند ظهور إعلان جديد أو تغيير."
-     }
-    },
-    {
-     "key": "news:rg",
-     "name": "Resmî Gazete",
-     "url": "https://www.resmigazete.gov.tr/",
-     "auto": "live",
-     "scope": {
-      "tr": "Dondurma ve kaldırma kararları Resmî Gazete’de ilan edilir; yaptırım ve MASAK ile ilgili başlıklar günlük içindekilerden ayıklanır.",
-      "en": "Freezing and unfreezing decisions are published in the Official Gazette; headings related to sanctions and MASAK are picked from the daily contents.",
-      "ar": "تُنشر قرارات التجميد والرفع في الجريدة الرسمية؛ وتُستخلص العناوين المتعلقة بالعقوبات وMASAK من الفهرس اليومي."
-     }
-    }
-   ]
-  },
-  {
-   "id": "regulators",
-   "tr": "Körfez ve diğer düzenleyici kurumlar (sayfa izleme)",
-   "en": "Gulf and other regulators (page monitoring)",
-   "ar": "الجهات التنظيمية في الخليج وغيرها (مراقبة الصفحات)",
-   "items": [
-    {
-     "key": "watch:eocn,cbuae,dfsa,fsra",
-     "name": "BAE – EOCN, Merkez Bankası (CBUAE), DFSA, FSRA",
-     "url": "https://www.uaeiec.gov.ae/en-us/un-page",
-     "auto": "live",
-     "scope": {
-      "tr": "Yürütme Ofisi’nin yerel terör listesi ve BM listesi sayfası ile Merkez Bankası, DFSA ve FSRA duyuruları izlenir. Bu kurumlar makine tarafından okunabilir liste yayımlamaz; değişiklik olduğunda uyarı verilir.",
-      "en": "The Executive Office’s local terrorist list and UN list page and announcements from the Central Bank, DFSA and FSRA are monitored. These bodies publish no machine-readable list; you are alerted when something changes.",
-      "ar": "تُراقَب صفحة المكتب التنفيذي لقائمة الإرهاب المحلية وقائمة الأمم المتحدة، وإعلانات المصرف المركزي وDFSA وFSRA. لا تنشر هذه الجهات قائمة يمكن قراءتها آليًا؛ يُرسَل تنبيه عند حدوث تغيير."
-     }
-    },
-    {
-     "key": "watch:sama",
-     "name": "Suudi Arabistan – Merkez Bankası (SAMA)",
-     "url": "https://www.sama.gov.sa/",
-     "auto": "live",
-     "scope": {
-      "tr": "SAMA duyuruları izlenir; değişiklik olduğunda uyarı verilir.",
-      "en": "SAMA announcements are monitored; you are alerted when something changes.",
-      "ar": "تُراقَب إعلانات ساما؛ ويُرسَل تنبيه عند حدوث تغيير."
-     }
-    },
-    {
-     "key": "watch:nctc,qcb,qfcra",
-     "name": "Katar – NCTC, Merkez Bankası (QCB), QFCRA",
-     "url": "https://www.nctc.gov.qa/",
-     "auto": "live",
-     "scope": {
-      "tr": "Ulusal Terörle Mücadele Komitesi’nin yerel listesi ile Merkez Bankası ve QFCRA duyuruları izlenir.",
-      "en": "The National Counter Terrorism Committee’s local list and announcements from the Central Bank and QFCRA are monitored.",
-      "ar": "تُراقَب القائمة المحلية للجنة الوطنية لمكافحة الإرهاب وإعلانات مصرف قطر المركزي وQFCRA."
-     }
-    },
-    {
-     "key": "watch:cbb",
-     "name": "Bahreyn – Merkez Bankası (CBB)",
-     "url": "https://www.cbb.gov.bh/",
-     "auto": "live",
-     "scope": {
-      "tr": "Bahreyn için makine tarafından okunabilir bir kamu yaptırım listesi yoktur; yalnızca resmî sayfa izlenir ve değişiklikte uyarı verilir. İsim eşleştirmesi yapılmaz.",
-      "en": "Bahrain has no machine-readable public sanctions list; only the official page is monitored and you are alerted on change. No name matching is performed.",
-      "ar": "لا توجد قائمة عقوبات عامة يمكن قراءتها آليًا في البحرين؛ تُراقَب الصفحة الرسمية فقط ويُرسَل تنبيه عند التغيير. لا تُجرى مطابقة للأسماء."
-     }
-    },
-    {
-     "key": "watch:cbk",
-     "name": "Kuveyt – Merkez Bankası (CBK)",
-     "url": "https://www.cbk.gov.kw/en/",
-     "auto": "live",
-     "scope": {
-      "tr": "Kuveyt Merkez Bankası duyuruları izlenir.",
-      "en": "Central Bank of Kuwait announcements are monitored.",
-      "ar": "تُراقَب إعلانات بنك الكويت المركزي."
-     }
-    },
-    {
-     "key": "watch:cbo",
-     "name": "Umman – Merkez Bankası (CBO)",
-     "url": "https://www.cbo.gov.om/",
-     "auto": "live",
-     "scope": {
-      "tr": "Umman Merkez Bankası duyuruları izlenir.",
-      "en": "Central Bank of Oman announcements are monitored.",
-      "ar": "تُراقَب إعلانات البنك المركزي العماني."
-     }
-    },
-    {
-     "key": "watch:dfat,mof",
-     "name": "Avustralya DFAT ve Japonya MOF – resmî sayfalar",
-     "url": "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list",
-     "auto": "live",
-     "scope": {
-      "tr": "Liste dosyalarına ek olarak iki kurumun resmî sayfaları da izlenir; sayfa değişirse uyarı verilir.",
-      "en": "In addition to the list files, the two authorities’ official pages are monitored; you are alerted if a page changes.",
-      "ar": "إضافة إلى ملفات القوائم تُراقَب الصفحات الرسمية للجهتين؛ ويُرسَل تنبيه إذا تغيّرت صفحة."
-     }
-    }
-   ]
-  },
-  {
-   "id": "trade",
-   "tr": "Ticaret, gemi ve mevzuat",
-   "en": "Trade, vessels and legislation",
-   "ar": "التجارة والسفن والتشريعات",
-   "items": [
-    {
-     "key": null,
-     "name": "TARIC (AB)",
-     "url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
-     "auto": "link",
-     "scope": {
-      "tr": "GTİP/CN koduna göre tarife ve ticaret tedbirleri.",
-      "en": "Tariff and trade measures by customs / CN code.",
-      "ar": "التعرفة وتدابير التجارة بحسب الرمز الجمركي / CN."
-     }
-    },
-    {
-     "key": null,
-     "name": "AB Reg. 833/2014 (konsolide) + Reg. 2022/428",
-     "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32022R0428",
-     "auto": "data",
-     "scope": {
-      "tr": "Yasaklı ürün ekleri uygulamada tutulur; GTİP’in ilk 4 hanesiyle aranır ve dayanak madde gösterilir.",
-      "en": "The prohibited-goods annexes are kept in the application; searched by the first four digits of the customs code, with the legal basis shown.",
-      "ar": "تُحفظ ملاحق السلع المحظورة داخل التطبيق؛ يُبحث بالأرقام الأربعة الأولى من الرمز الجمركي ويُعرض السند القانوني."
-     }
-    },
-    {
-     "key": null,
-     "name": "AB Reg. 2021/821 (çift kullanımlı ürünler)",
-     "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02021R0821-20241108",
-     "auto": "link",
-     "scope": {
-      "tr": "Ek I kontrol listesi (kategori kodlu; GTİP kodu değildir).",
-      "en": "Annex I control list (category codes; not customs codes).",
-      "ar": "قائمة الرقابة في الملحق I (برموز فئات وليست رموزًا جمركية)."
-     }
-    },
-    {
-     "key": null,
-     "name": "VesselFinder (IMO)",
-     "url": "https://www.vesselfinder.com/tr/vessels/details/9244192",
-     "auto": "link",
-     "scope": {
-      "tr": "IMO numarası ile gemi bayrağı, sahip ve konum bilgisi.",
-      "en": "Vessel flag, owner and position by IMO number.",
-      "ar": "علم السفينة ومالكها وموقعها بحسب رقم IMO."
-     }
-    },
-    {
-     "key": null,
-     "name": "Seasearcher (S&P Global)",
-     "url": "https://www.seasearcher.com/vessels/",
-     "auto": "external",
-     "scope": {
-      "tr": "Lisanslı gemi ve ticaret verisi; kurumun kendi aboneliğiyle kullanılır.",
-      "en": "Licensed vessel and trade data; used with the institution’s own subscription.",
-      "ar": "بيانات سفن وتجارة مرخَّصة؛ تُستخدم باشتراك المؤسسة نفسها."
-     }
-    },
-    {
-     "key": null,
-     "name": "Türkiye sınır kapıları",
-     "url": "https://www.udybelgesi.com/turkiye-sinir-kapilari.asp",
-     "auto": "data",
-     "scope": {
-      "tr": "Kara sınır kapıları için başvuru tablosu uygulama içinde bulunur.",
-      "en": "A reference table of land border crossings is built into the application.",
-      "ar": "جدول مرجعي للمعابر الحدودية البرية مُدمج في التطبيق."
-     }
-    }
-   ]
-  },
-  {
-   "id": "licensed",
-   "tr": "Lisanslı araçlar (kurumun kendi lisansıyla)",
-   "en": "Licensed tools (with the institution’s own licence)",
-   "ar": "أدوات مرخَّصة (بترخيص المؤسسة نفسها)",
-   "items": [
-    {
-     "key": null,
-     "name": "World-Check (Refinitiv)",
-     "url": "https://worldcheck.refinitiv.com/",
-     "auto": "external",
-     "scope": {
-      "tr": "Kişi ve kuruluş taraması, PEP ve olumsuz medya.",
-      "en": "Person and entity screening, PEP and adverse media.",
-      "ar": "فحص الأشخاص والكيانات وPEP والأخبار السلبية."
-     }
-    },
-    {
-     "key": null,
-     "name": "Spark Interfax",
-     "url": "https://spark-interfax.ru/system#/dashboard",
-     "auto": "external",
-     "scope": {
-      "tr": "Rus şirketleri: sahiplik, yöneticiler ve mali tablolar.",
-      "en": "Russian companies: ownership, directors and financials.",
-      "ar": "الشركات الروسية: الملكية والمديرون والقوائم المالية."
-     }
-    },
-    {
-     "key": null,
-     "name": "Bankers Almanac (LexisNexis Risk)",
-     "url": "https://bankersalmanac.lexisnexisrisk.com/home",
-     "auto": "external",
-     "scope": {
-      "tr": "Banka ve muhabir banka bilgileri, SWIFT/BIC ve ortaklıklar.",
-      "en": "Bank and correspondent bank details, SWIFT/BIC and ownership.",
-      "ar": "بيانات البنوك والبنوك المراسلة وSWIFT/BIC والملكية."
-     }
-    },
-    {
-     "key": null,
-     "name": "Seasearcher",
-     "url": "https://www.seasearcher.com/vessels/",
-     "auto": "external",
-     "scope": {
-      "tr": "Gemi geçmişi ve sahiplik bilgisi.",
-      "en": "Vessel history and ownership.",
-      "ar": "تاريخ السفن وملكيتها."
-     }
-    }
-   ]
-  },
-  {
-   "id": "apis",
-   "tr": "Resmî veri hizmetleri (teknik kaynaklar)",
-   "en": "Official data services (technical sources)",
-   "ar": "خدمات البيانات الرسمية (المصادر التقنية)",
-   "items": [
-    {
-     "key": "list:ofac",
-     "name": "OFAC Sanctions List Service",
-     "url": "https://sanctionslist.ofac.treas.gov/Home/SdnList",
-     "auto": "live",
-     "scope": {
-      "tr": "OFAC’ın resmî indirme hizmeti; SDN listesi ve değişiklikler buradan alınır.",
-      "en": "OFAC’s official download service; the SDN list and its changes come from here.",
-      "ar": "خدمة التنزيل الرسمية لـ OFAC؛ تُؤخذ منها قائمة SDN وتغييراتها."
-     }
-    },
-    {
-     "key": "list:eu",
-     "name": "AB Financial Sanctions Files",
-     "url": "https://finance.ec.europa.eu/eu-and-world/sanctions-restrictive-measures/overview-sanctions-and-related-resources_en",
-     "auto": "live",
-     "scope": {
-      "tr": "AB’nin konsolide yaptırım dosyaları.",
-      "en": "The EU’s consolidated sanctions files.",
-      "ar": "ملفات العقوبات الموحّدة للاتحاد الأوروبي."
-     }
-    },
-    {
-     "key": "list:un",
-     "name": "BM Güvenlik Konseyi konsolide listesi (XML)",
-     "url": "https://main.un.org/securitycouncil/en/content/un-sc-consolidated-list",
-     "auto": "live",
-     "scope": {
-      "tr": "Konsolide liste dosyası düzenli olarak indirilir.",
-      "en": "The consolidated list file is downloaded regularly.",
-      "ar": "يُنزَّل ملف القائمة الموحّدة بانتظام."
-     }
-    },
-    {
-     "key": "news:eu",
-     "name": "AB Resmî Gazete (L serisi) yayınları",
-     "url": "https://eur-lex.europa.eu/EN/display-feed.rss?rssId=222",
-     "auto": "live",
-     "scope": {
-      "tr": "AB Resmî Gazetesi’nde yayımlanan yeni düzenlemeler.",
-      "en": "New acts published in the EU Official Journal.",
-      "ar": "التشريعات الجديدة المنشورة في الجريدة الرسمية للاتحاد الأوروبي."
-     }
-    },
-    {
-     "key": "news:fr",
-     "name": "ABD Federal Register (OFAC bildirimleri)",
-     "url": "https://www.federalregister.gov/api/v1/documents.json?conditions[agencies][]=foreign-assets-control-office",
-     "auto": "live",
-     "scope": {
-      "tr": "Yasal bildirim metinleri; OFAC duyuru sayfasına tamamlayıcıdır.",
-      "en": "Legal notice texts; complements the OFAC announcements page.",
-      "ar": "نصوص الإشعارات القانونية؛ تكمل صفحة إعلانات OFAC."
-     }
-    },
-    {
-     "key": null,
-     "name": "AB Yaptırım Haritası",
-     "url": "https://www.sanctionsmap.eu/",
-     "auto": "link",
-     "scope": {
-      "tr": "Rejim düzeyinde hukuki metinler (ticaret, seyahat ve sektörel tedbirler dahil).",
-      "en": "Legal texts by regime (including trade, travel and sectoral measures).",
-      "ar": "النصوص القانونية بحسب النظام (بما فيها تدابير التجارة والسفر والقطاعات)."
-     }
-    }
-   ]
-  }
- ]
+  ]
 }

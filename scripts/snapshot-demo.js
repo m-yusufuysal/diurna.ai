@@ -39,7 +39,7 @@ async function get(p, key) { const r = await call('GET', p); if (r && r.__status
   console.log('Kullanıcı:', l.user.email, '·', l.user.role, '· kurum:', l.org?.name);
   out['/status'] = scrub(st);
   for (const p of ['/items', '/me/today', '/notifications', '/tasks', '/analytics', '/org/users', '/bulletins', '/bulletins/today', '/customers', '/match', '/adverse/info',
-    '/trade/meta', '/trade/notes', '/dd', '/sources', '/fatf', '/audit', '/settings/full', '/blocklist', '/reference', '/org/branches', '/roi', '/docs', '/outbox', '/apikeys', '/webhooks',
+    '/trade/meta', '/trade/notes', '/dd', '/sources', '/byol', '/fatf', '/audit', '/settings/full', '/blocklist', '/reference', '/org/branches', '/roi', '/docs', '/outbox', '/apikeys', '/webhooks',
     '/me/watchlist', '/me/security', '/public/brand', '/public/status', '/watch', '/fetch/stats', '/translate/info', '/ai/status', '/ai/log', '/entities/stats', '/entities/feed?limit=40',
     '/me/report?lang=tr', '/me/report?lang=en', '/me/report?lang=ar']) await get(p);
   /* okuyucu paneli: öğelerin tam metni (sunucu önbelleği; saniyede sınırlı) */

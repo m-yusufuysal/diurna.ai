@@ -219,6 +219,7 @@ Yönetim menüsü yalnızca **Admin** rolüne açıktır.
 | **Kullanıcılar** | Kullanıcı ekleme (geçici parola bir kez gösterilir), rol ve şube atama, pasife alma, MFA sıfırlama. Parola sıfırlama platform ekibindedir. |
 | **Şubeler** | Genel Müdürlük–bölge–şube hiyerarşisi. Şube kullanıcıları ve raporları buna göre ayrışır. |
 | **Listeler** | Müşteri taramasına dahil edilecek listeler ve liste bazında eşik. **Dış sorgular** kartı: *Olumsuz haber taraması (GDELT)* ve *Interpol kırmızı bülten sorgusu* için Kurulum varsayılanı / Açık / Kapalı seçimi. Değişiklik denetim izine yazılır. Ayrıca kurum içi engelleme listesi. |
+| **Lisanslı veri ortakları** | Kendi veri sağlayıcı aboneliğinizi bağlama (BYOL, aşağıya bakın). |
 | **Mevzuat ve veri** | Kurumun tabi olduğu ülke katmanları (TR, AE, SA, QA, BH, KW, OM) ve veri yerleşimi kaydı. |
 | **Entegrasyonlar** | E-posta (SMTP) ayarı, API anahtarları (değer bir kez gösterilir), webhook’lar. Kurumsal tek oturum (SSO) için ayar alanı vardır; henüz çalışmaz. |
 | **Güvenlik** | MFA zorunluluğu, oturum zaman aşımı, en az parola uzunluğu, IP izin listesi, saklama süreleri, denetim izi dışa aktarımı. |
@@ -227,6 +228,19 @@ Yönetim menüsü yalnızca **Admin** rolüne açıktır.
 **Kaynakları açmak:** *Kaynaklar → Dizin*’de “Kapalı – yönetici açabilir” rozetli bir kaynak için yanındaki bağlantı sizi doğrudan **Yönetim → Listeler** ekranına götürür. “Kapalı – lisans gerekli” rozetli kaynaklar (OpenSanctions yedeği, BAE/Katar/Suudi listeleri, PEP) bir lisans gerektirir ve kurulum düzeyinde etkinleştirilir; yönetici ekranından açılmaz.
 
 **Yapay zekâ anahtarı:** YZ ve çeviri özellikleri, kurulumda tanımlanan bir sağlayıcıya bağlanır (ortam değişkenleri, bkz. [Kurulum / Teknik](#13-kurulum--teknik)). Yönetim → Yapay zekâ ekranı özelliği kurum için açıp kapatır; anahtar tanımlı değilse düğmeler neden çalışmadığını açıklar ve hiçbir çıktı uydurulmaz.
+
+### Kendi lisansınızı bağlama (BYOL)
+Kurumunuzun kendi aboneliği olan bir veri sağlayıcısı varsa, kimlik bilgilerini **Yönetim → Lisanslı veri ortakları** ekranına girerek verisini müşteri taramasına katabilirsiniz. Diurna veriyi kendisi satın almaz ya da dağıtmaz; yalnızca sizin hesabınızla sizin sağlayıcınıza bağlanır.
+
+| Sağlayıcı | Bağlantı türü |
+|---|---|
+| **OpenSanctions** | Doğrulanmış: API anahtarı `api.opensanctions.org` üzerinde (`Authorization: ApiKey`) gerçekten sınanır. Lisanslı toplu veri (BAE, Katar, Suudi Arabistan) alınabilirse taramaya eklenir; teslim biçimi sözleşmenize bağlıdır, alınamazsa nedeni ekranda görünür. |
+| Dow Jones Risk & Compliance, LSEG World-Check One, LexisNexis Bridger / WorldCompliance, Moody’s / Bureau van Dijk Orbis, Refinitiv, ComplyAdvantage, Sayari | Genel HTTP bağdaştırıcısı (OAuth2, Bearer, Basic ya da özel başlık). Bu sağlayıcıların gerçek uç noktaları sözleşmeye göre değiştiği için adresleri ve alan eşlemesini sağlayıcınızın API belgesinden siz girersiniz. |
+| **Özel REST (HTTPS)** | Herhangi bir HTTPS servisi: temel adres, kimlik doğrulama, JSON ya da CSV biçimi ve alan eşlemesi (ad, takma ad, kimlik, tür, ülke, program, tarih). SFTP henüz desteklenmez. |
+
+Adımlar: sağlayıcı kartında bilgileri girin → **Kaydet** → **Bağlantıyı test et** → **Şimdi eşitle** → **Taramaya dahil et**. Durum her zaman gerçektir: *Kurulmadı*, *Yapılandırıldı – test edilmedi*, *Bağlı* ya da *Hata: …*. Eşitlenen kayıtlar kurumunuzun taramasında “Lisanslı veri ortağı (kurumunuz)” kaynağı olarak görünür ve **Kaynaklar** dizininde kendi rozetini taşır.
+
+Güvenlik: kimlik bilgileri kurumunuza özel olarak AES-256-GCM ile şifrelenir, arayüze ya da API yanıtlarına geri verilmez (yalnızca son 4 karakter), yalnızca Admin rolü yönetir, her değişiklik denetim izine yazılır (değer yazılmaz) ve giden adresler SSRF korumasından geçer; yalnızca genel `https://` adresleri kabul edilir. Eşitlenen veri kurumunuza özeldir, diğer kurumlarla paylaşılmaz.
 
 ## 10. Güvenlik
 
