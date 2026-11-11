@@ -1,14 +1,167 @@
 {
-  "_comment": "Yapılandırılmış liste dosyası sunmayan resmî sayfalar: içerik parmak izi + bağlantı farkı ile izlenir (değişince bildirim, eklenen/çıkan bağlantılar gösterilir). URL'ler buradan değiştirilebilir; erişilemeyen sayfa 'hata' olarak görünür, uydurma veri üretilmez.",
-  "pages": [
-    { "id": "eocn", "jur": "AE", "label": "BAE – Yürütme Ofisi (EOCN / UAE IEC): BM ve Yerel Terör Listesi", "url": "https://www.uaeiec.gov.ae/en-us/un-page", "everyMin": 60 },
-    { "id": "cbuae", "jur": "AE", "label": "BAE Merkez Bankası (CBUAE): duyurular", "url": "https://www.cbuae.gov.ae/en/media-and-publications/news", "everyMin": 180 },
-    { "id": "sama", "jur": "SA", "label": "Suudi Arabistan Merkez Bankası (SAMA)", "url": "https://www.sama.gov.sa/en-US/Pages/default.aspx", "everyMin": 180 },
-    { "id": "nctc", "jur": "QA", "label": "Katar Ulusal Terörle Mücadele Komitesi (NCTC): yerel liste", "url": "https://www.nctc.gov.qa/", "everyMin": 120 },
-    { "id": "qcb", "jur": "QA", "label": "Katar Merkez Bankası (QCB)", "url": "https://www.qcb.gov.qa/en/Pages/News.aspx", "everyMin": 180 },
-    { "id": "cbb", "jur": "BH", "label": "Bahreyn Merkez Bankası (CBB)", "url": "https://www.cbb.gov.bh/", "everyMin": 180 },
-    { "id": "masak", "jur": "TR", "label": "MASAK – 6415/7262 mal varlığı dondurma listeleri", "url": "https://masak.hmb.gov.tr/bkk-ile-malvarliklari-dondurulanlar", "everyMin": 60 },
-    { "id": "dfat", "jur": "AU", "label": "Avustralya DFAT – Konsolide Yaptırım Listesi", "url": "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list", "everyMin": 180 },
-    { "id": "mof", "jur": "JP", "label": "Japonya Maliye Bakanlığı (MOF) – ekonomik yaptırımlar", "url": "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/index.html", "everyMin": 180 }
-  ]
+ "_comment": "Yapılandırılmış liste dosyası sunmayan resmî sayfalar: içerik parmak izi + bağlantı farkı ile izlenir (değişince bildirim, eklenen/çıkan bağlantılar gösterilir). URL'ler buradan değiştirilebilir; erişilemeyen sayfa 'hata' olarak görünür, uydurma veri üretilmez.",
+ "pages": [
+  {
+   "id": "eocn",
+   "jur": "AE",
+   "label": "BAE – Yürütme Ofisi (EOCN / UAE IEC): BM ve Yerel Terör Listesi",
+   "url": "https://www.uaeiec.gov.ae/en-us/un-page",
+   "everyMin": 60
+  },
+  {
+   "id": "cbuae",
+   "jur": "AE",
+   "label": "BAE Merkez Bankası (CBUAE): duyurular",
+   "url": "https://www.cbuae.gov.ae/en/media-and-publications/news",
+   "everyMin": 180
+  },
+  {
+   "id": "sama",
+   "jur": "SA",
+   "label": "Suudi Arabistan Merkez Bankası (SAMA)",
+   "url": "https://www.sama.gov.sa/en-US/Pages/default.aspx",
+   "everyMin": 180
+  },
+  {
+   "id": "nctc",
+   "jur": "QA",
+   "label": "Katar Ulusal Terörle Mücadele Komitesi (NCTC): yerel liste",
+   "url": "https://www.nctc.gov.qa/",
+   "everyMin": 120
+  },
+  {
+   "id": "qcb",
+   "jur": "QA",
+   "label": "Katar Merkez Bankası (QCB)",
+   "url": "https://www.qcb.gov.qa/en/Pages/News.aspx",
+   "everyMin": 180
+  },
+  {
+   "id": "cbb",
+   "jur": "BH",
+   "label": "Bahreyn Merkez Bankası (CBB)",
+   "url": "https://www.cbb.gov.bh/",
+   "everyMin": 180
+  },
+  {
+   "id": "masak",
+   "jur": "TR",
+   "label": "MASAK – 6415/7262 mal varlığı dondurma listeleri",
+   "url": "https://masak.hmb.gov.tr/bkk-ile-malvarliklari-dondurulanlar",
+   "everyMin": 60
+  },
+  {
+   "id": "dfat",
+   "jur": "AU",
+   "label": "Avustralya DFAT – Konsolide Yaptırım Listesi",
+   "url": "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list",
+   "everyMin": 180
+  },
+  {
+   "id": "mof",
+   "jur": "JP",
+   "label": "Japonya Maliye Bakanlığı (MOF) – ekonomik yaptırımlar",
+   "url": "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/index.html",
+   "everyMin": 180
+  },
+  {
+   "id": "cbk",
+   "jur": "KW",
+   "label": "Kuveyt Merkez Bankası (CBK) / Kuveyt Ulusal Terörle Mücadele Komitesi: duyurular",
+   "url": "https://www.cbk.gov.kw/en/",
+   "everyMin": 240
+  },
+  {
+   "id": "cbo",
+   "jur": "OM",
+   "label": "Umman Merkez Bankası (CBO) / Ulusal Terör Finansmanı Komitesi",
+   "url": "https://www.cbo.gov.om/",
+   "everyMin": 240
+  },
+  {
+   "id": "masak-posts",
+   "jur": "TR",
+   "label": "MASAK – duyurular ve basın (resmî WP JSON)",
+   "url": "https://masak.hmb.gov.tr/portal/v2/posts?per_page=40&_fields=id,date,slug,title,link",
+   "type": "wpjson",
+   "everyMin": 60
+  },
+  {
+   "id": "masak-rehber",
+   "jur": "TR",
+   "label": "MASAK – ŞİB sektörel rehberleri",
+   "url": "https://masak.hmb.gov.tr/sektorel-sib-rehberleri",
+   "everyMin": 720
+  },
+  {
+   "id": "masak-mevzuat",
+   "jur": "TR",
+   "label": "MASAK – mevzuat (5549, 6415, 7262, tebliğler)",
+   "url": "https://masak.hmb.gov.tr/mevzuat-tamami",
+   "everyMin": 1440
+  },
+  {
+   "id": "masak-yaptirim",
+   "jur": "TR",
+   "label": "MASAK – idari para cezaları (5549 md.13)",
+   "url": "https://masak.hmb.gov.tr/yaptirimlar",
+   "everyMin": 1440
+  },
+  {
+   "id": "bddk-duyuru",
+   "jur": "TR",
+   "label": "BDDK – duyurular",
+   "url": "https://www.bddk.org.tr/Duyuru",
+   "everyMin": 180
+  },
+  {
+   "id": "bddk-mevzuat",
+   "jur": "TR",
+   "label": "BDDK – mevzuat",
+   "url": "https://www.bddk.org.tr/Mevzuat",
+   "everyMin": 720
+  },
+  {
+   "id": "tcmb-duyuru",
+   "jur": "TR",
+   "label": "TCMB – duyurular",
+   "url": "https://www.tcmb.gov.tr/wps/wcm/connect/TR/TCMB+TR/Main+Menu/Duyurular/",
+   "everyMin": 180
+  },
+  {
+   "id": "spk",
+   "jur": "TR",
+   "label": "SPK – duyurular ve bülten",
+   "url": "https://www.spk.gov.tr/",
+   "everyMin": 360
+  },
+  {
+   "id": "kvkk",
+   "jur": "TR",
+   "label": "KVKK – duyurular ve kurul kararları",
+   "url": "https://www.kvkk.gov.tr/",
+   "everyMin": 720
+  },
+  {
+   "id": "dfsa",
+   "jur": "AE",
+   "label": "DFSA (Dubai) – haberler ve bildirimler",
+   "url": "https://www.dfsa.ae/news",
+   "everyMin": 360
+  },
+  {
+   "id": "fsra",
+   "jur": "AE",
+   "label": "ADGM FSRA – duyurular",
+   "url": "https://www.adgm.com/media/announcements",
+   "everyMin": 360
+  },
+  {
+   "id": "qfcra",
+   "jur": "QA",
+   "label": "QFCRA (Katar Finans Merkezi) – duyurular",
+   "url": "https://www.qfcra.com/en-us/Pages/News.aspx",
+   "everyMin": 360
+  }
+ ]
 }

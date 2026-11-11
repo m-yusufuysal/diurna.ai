@@ -75,14 +75,15 @@ const b = require('../lib/brand').get(); assert(b.name.tr && b.tagline.en && b.d
   const tr1 = await TR.translate(['OFAC designated MAHAN AIR IMO 9074729 on 12 May 2026'], 'tr', 'news'); assert(tr1.ai && tr1.items[0].text.includes('IMO 9074729') && tr1.items[0].text.includes('MAHAN AIR') && tr1.items[0].text.startsWith('[TR]')); ok('çeviri: LLM sağlayıcısı ad/IMO/tarihi korur (sahte sunucu)');
   mode = 'bad'; await assert.rejects(TR.translate(['Sanctions on IMO 9074729 vessel'], 'tr', 'regulation'), e => e.code === 'integrity'); ok('çeviri: jeton kaybeden LLM çıktısı reddedilir');
   // faturalama / platform sahibi
-  const PL = require('../lib/platform'), auth = require('../lib/auth'), U = require('../lib/util');
+  const PL = require('../lib/owner'), auth = require('../lib/auth'), U = require('../lib/util');
   process.env.UM_PLATFORM_PASSWORD = 'Tamga-Kule#2026x'; const pu = await PL.ensurePlatformAdmin(); assert(pu && pu.role === 'Platform' && pu.mustChangePassword && pu.mfaRequired); assert(!store.orgs().some(o => o.id === '_platform') && store.orgsAll().some(o => o.id === '_platform')); ok('platform: yönetici tohumlanır, kurum listesinde görünmez');
-  const co = await PL.createOrg({ name: 'Test Bankası A.Ş.', seats: 2, plan: 'starter', pricePerSeat: 100, contract: { billingEmail: 'fin@test.example', currency: 'TRY' }, admin: { name: 'Ada Yönetici', email: 'ada@test.example', username: 'ada.yonetici' } }, pu);
+  const co = await PL.createOrg({ name: 'Test Bankası A.Ş.', seats: 2, admin: { name: 'Ada Yönetici', email: 'ada@test.example', username: 'ada.yonetici' } }, pu);
   assert(co.tempPassword.length >= 12 && co.admin.mustChangePassword && co.admin.username === 'ada.yonetici'); ok('platform: kurum + yönetici (kullanıcı adı + geçici parola) oluşturulur');
   let lr = await auth.login('ADA.yonetici', co.tempPassword, '1.1.1.1', 'x'); assert(lr.user.mustChangePassword && lr.sid); ok('giriş: kullanıcı adıyla; mustChangePassword işaretli');
   await assert.rejects(auth.changePassword(lr.user.id, co.tempPassword, co.tempPassword)); await auth.changePassword(lr.user.id, co.tempPassword, 'Kestane-Bulut#7731-Zr'); assert(!store.authUsers().find(u => u.id === lr.user.id).mustChangePassword); ok('parola değişimi bayrağı kaldırır');
   await PL.createUserFor('test-bankasi-a-s', { name: 'Bora', email: 'bora@test.example', role: 'Analist' }, pu); await assert.rejects(PL.createUserFor('test-bankasi-a-s', { name: 'Can', email: 'can@test.example', role: 'Analist' }, pu), e => e.code === 'seats'); ok('koltuk sınırı sözleşmeyi aşan kullanıcıyı reddeder');
   assert.throws(() => PL.updateOrg('test-bankasi-a-s', { seats: 1 }, pu), e => e.code === 'seats'); PL.updateOrg('test-bankasi-a-s', { seats: 3 }, pu); ok('koltuk sayısı aktif kullanıcı sayısının altına inemez');
+  PL.updateOrg('test-bankasi-a-s', { pricePerSeat: 100, currency: 'TRY', billingEmail: 'fin@test.example' }, pu); /* faturalama modülü kapalı ama arka uç mantığı sınanır */
   const T0 = U.todayISO(); const inv = PL.createInvoice({ orgId: 'test-bankasi-a-s', issueDate: U.addDays(T0, -20), dueDate: U.addDays(T0, -1) }, pu); assert.strictEqual(inv.total, +(3 * 100 * 1.2).toFixed(2)); assert.strictEqual(inv.status, 'gecikti'); assert(inv.number.startsWith('DRN-')); ok('fatura: toplam (koltuk × birim + KDV), vade geçince "gecikti"');
   const pdf = await PL.invoicePdf(inv); assert(pdf.slice(0, 4).toString() === '%PDF' && pdf.length > 3000); ok('fatura PDF üretilir');
   PL.tick(); assert(!PL.orgSuspended('test-bankasi-a-s')); const list = store.global('invoices.json', []); list[0].dueDate = U.addDays(T0, -30); store.saveGlobal('invoices.json', list); PL.tick(); assert(PL.orgSuspended('test-bankasi-a-s')); ok('ek süre dolunca erişim askıya alınır');
@@ -90,5 +91,58 @@ const b = require('../lib/brand').get(); assert(b.name.tr && b.tagline.en && b.d
   PL.setInvoiceStatus(inv.id, 'odendi', 'havale alındı', pu); assert(!PL.orgSuspended('test-bankasi-a-s')); assert.strictEqual(PL.invoicesOf('test-bankasi-a-s')[0].status, 'odendi'); ok('ödendi işaretlenince askı kalkar');
   const inv2 = PL.createInvoice({ orgId: 'test-bankasi-a-s', issueDate: T0, dueDate: U.addDays(T0, 3) }, pu); PL.tick(); assert((store.global('invoices.json', []).find(i => i.id === inv2.id).reminders || []).includes('d3')); ok('vade hatırlatması (3 gün kala) bir kez gönderilir');
   llmSrv.close(); delete process.env.UM_LLM_BASE_URL; delete process.env.UM_LLM_MODEL;
-  console.log(`\n${n} test geçti.`);
+  { // QA regresyon: yazım hatası / transliterasyon (varsayılan eşik 85) ve yanlış-pozitif sınırı
+    const M = require('../lib/match'); const sc = (a, b) => M.scoreTokens(M.tokens(a), M.tokens(b)).score;
+    assert(sc('Volta Shiping Services', 'Volta Shipping Services L.L.C.') >= 85, 'Volta Shiping');
+    assert(sc('Hüseyin Shamkhani', 'Hossein Shamkhani') >= 85, 'Hüseyin Shamkhani');
+    assert(sc('Huseyin Shamkhani', 'SHAMKHANI Hossein') >= 85, 'Huseyin/ters sıra');
+    for (const [a, b] of [['Hasan Shamkhani', 'Hossein Shamkhani'], ['Alpha Shipping Services', 'Beta Shipping Services'], ['Ali Yilmaz', 'Veli Yilmaz'], ['Mehmet Kaya', 'Mehmet Demir'], ['Hussein Ali', 'Hasan Ali']]) assert(sc(a, b) < 85, 'yanlış pozitif: ' + a + ' ~ ' + b);
+    const ix = new M.NameIndex(); ix.add({ id: 1, n: ['Hossein SHAMKHANI'], names: ['Hossein SHAMKHANI'], t: 'p' }); ix.add({ id: 2, n: ['VOLTA SHIPPING SERVICES L.L.C.'], names: ['VOLTA SHIPPING SERVICES L.L.C.'], t: 'e' });
+    assert.strictEqual(ix.search('Hüseyin Shamkhani', { threshold: 85 }).length, 1); assert.strictEqual(ix.search('Volta Shiping Services', { threshold: 85 }).length, 1); assert.strictEqual(ix.search('Hasan Shamkhani', { threshold: 85 }).length, 0);
+    ok('eşleştirme regresyonu: Volta Shiping + Hüseyin Shamkhani ≥85; Hasan/Alpha/Veli yanlış pozitif vermez');
+    const Bu = require('../lib/bulletin'); assert(Bu.validateForApproval({ items: [] }).some(e => e.code === 'empty')); ok('boş bülten doğrulaması: empty hatası');
+  }
+  { // Resmî liste ayrıştırıcıları (kayıtlı örnek dosyalarla; canlı çekim ayrıca doğrulandı)
+    const R = require('../lib/regional'); const fx = f => require('path').join(__dirname, 'fixtures', f); const rd = f => fs.readFileSync(fx(f));
+    const au = R.parseDFAT(rd('dfat-mini.xlsx')); assert.strictEqual(au.length, 3, 'DFAT: 1000/1000a/1000b tek kayıt'); const v = au.find(e => e.id === '1000'); assert(v.n.includes('فولتا للخدمات البحرية') && v.n.includes('Volta Shiping') && v.n[0].startsWith('VOLTA') && v.u === '2024-03-12'); assert.deepStrictEqual(au.find(e => e.id === '2001').imo, ['9179842']); assert.strictEqual(au.find(e => e.id === '2001').t, 'v'); ok('DFAT xlsx ayrıştırıcı: ad+takma ad+Arapça yazım tek kayıt, IMO, tarih');
+    const jp = R.parseMOF(rd('mof-mini.xlsx')); assert.strictEqual(jp.length, 2, 'MOF: silinen satır atlanır'); assert(jp[0].n.includes('MOHAMMAD HASSAN AKHUND') && jp[0].n.includes('محمد حسن آخوند') && jp[0].n.includes('Mullah') && jp[0].d === '2001-09-22'); assert.strictEqual(jp[1].t, 'e'); ok('Japonya MOF xlsx ayrıştırıcı: İngilizce/Arapça ad, takma ad, tarih, silinen satır atlanır');
+    const tr = R.parseMASAK(JSON.parse(fs.readFileSync(fx('masak-sample.json'), 'utf8'))); assert(tr.length >= 30 && tr.every(e => e.s === 'tr' && e.n.length && e.ref && e.d)); const o39 = tr.find(e => /OFFICE 39/.test(e.n[0])); assert(o39 && o39.n.includes('Bureau 39') && o39.prog === '7262' && o39.d === '2021-02-24' && o39.ref === 'RG 31405'); assert(tr.some(e => e.prog.startsWith('6415 md.5')) && tr.some(e => e.prog.startsWith('6415 md.6')) && tr.some(e => e.prog.startsWith('6415 md.7')) && tr.some(e => e.dob)); assert.strictEqual(new Set(tr.map(e => e.id)).size, tr.length); ok('MASAK ayrıştırıcı: 6415 md.5/6/7 + 7262, karar (RG tarihi/sayısı), takma adlar, doğum tarihi, tekil kimlik');
+  }
+  { // Çok dilli eşleştirme regresyonu (kayıtlı etiketli çiftler: UN/UAE/Katar/Suudi/Japonya/DFAT gerçek adları + el yapımı TR/AR/RU/ZH/DE varyantları)
+    const M = require('../lib/match'); const P = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'match-pairs.json'), 'utf8')); const sc = (a, b) => M.scoreNames(M.tokens(a), M.tokens(b)).score;
+    const st = f => { let tp = 0, fp = 0, fn = 0; for (const p of P.filter(f)) { const h = sc(p.q, p.n) >= 85; if (p.y && h) tp++; else if (p.y) fn++; else if (h) fp++; } return { tp, fp, fn, prec: tp / (tp + fp || 1), rec: tp / (tp + fn || 1) }; };
+    const all = st(() => true), hand = st(p => p.k === 'hand'), ar = st(p => p.k.startsWith('ar-lat'));
+    assert(all.prec >= 0.98, 'kesinlik ' + all.prec); assert(hand.rec >= 0.85, 'el yapımı duyarlılık ' + hand.rec); assert(ar.rec >= 0.4 && ar.fp === 0, 'Arapça↔Latin ' + JSON.stringify(ar));
+    for (const [a, b] of [['Hüseyin Shamkhani', 'Hossein SHAMKHANI'], ['Volta Shiping', 'VOLTA SHIPPING SERVICES L.L.C.'], ['İbrahim Çağlar', 'Ibrahim Caglar'], ['Müller GmbH', 'Mueller'], ['محمد حسن أخوند', 'MOHAMMAD HASSAN AKHUND'], ['Сергей Лавров', 'Sergei Lavrov'], ['习近平', 'Xi Jinping'], ['Abdul Rahman Al Sayed', 'Abdulrahman Alsayed'], ['Al-Qaida', 'Alqaeda'], ['Mohamed bin Zayed', 'Muhammad ibn Zayed']]) assert(sc(a, b) >= 85, a + ' ~ ' + b + ' = ' + sc(a, b));
+    for (const [a, b] of [['Hasan Shamkhani', 'Hossein Shamkhani'], ['Mehmet Öz', 'Mohammed Ozil'], ['Ali Yilmaz', 'Veli Yilmaz'], ['Ivan Ivanov', 'Ivan Petrov'], ['Alpha Shipping Services', 'Beta Shipping Services']]) assert(sc(a, b) < 85, 'yanlış pozitif ' + a + ' ~ ' + b);
+    assert.strictEqual(M.fold('IŞIK İSTANBUL ıi'), 'isik istanbul ii'); assert.strictEqual(M.fold('١٢٣ أ إ آ'), '123 a a a'); ok(`çok dilli eşleştirme: kesinlik ${all.prec.toFixed(2)}, duyarlılık el yapımı ${hand.rec.toFixed(2)} / Arapça↔Latin ${ar.rec.toFixed(2)} (hata pozitif ${all.fp})`);
+  }
+  
+/* ---- İkincil kimlik doğrulayıcılar (kimlik/doğum yılı/kripto) ---- */
+{
+  const SEC = require('../lib/secondary'); const Mm = require('../lib/match');
+  const rm = SEC.parseRemarks('DOB 08 Jan 1960; POB Tehran, Iran; nationality Iran; Passport A1234567 (Iran) expires 2030; National ID No. 0044123456 (Iran); Digital Currency Address - XBT 1HrQ3MoXz8y9uPzLkN4bW7vFh2qDcRtYaB;');
+  assert(rm.dobs.includes('1960-01-08')); ok('OFAC remarks: doğum tarihi/yılı');
+  assert(rm.ids.includes('A1234567') && rm.ids.includes('0044123456')); ok('OFAC remarks: pasaport + kimlik no'); assert(rm.wallets.length === 1 && rm.nat[0] === 'Iran'); ok('OFAC remarks: cüzdan + uyruk');
+  const ix = new Mm.NameIndex(); ix.add({ s: 'tr', id: 'X1', n: ['MEHMET KAYA'], t: 'p', dobs: ['1975-03-02'], ids: ['12345678901'] }); ix.add({ s: 'tr', id: 'X2', n: ['AHMET YILMAZ'], t: 'p', dobs: ['1980-01-01'] });
+  const byId = ix.search('Tamamen Farklı İsim', { threshold: 85, ids: ['123 456 789 01'] }); assert(byId.length === 1 && byId[0].entry.id === 'X1' && byId[0].reasons.includes('taxid')); ok('kimlik no birebir → ad farklı olsa da bulunur');
+  const h = ix.search('Ahmet Yılmaz', { threshold: 85 }); assert(h.length === 1); ok('ad eşleşmesi');
+  const a1 = SEC.adjust({ id: 'c1', yob: '1952' }, h, { thresholdOf: () => 85 }); assert(a1.hits.length === 0 && a1.dropped[0].why === 'yob_conflict'); ok('doğum yılı çelişkisi → elendi (yanlış pozitif azalır)');
+  const a2 = SEC.adjust({ id: 'c1', yob: '1981' }, h, { thresholdOf: () => 85 }); assert(a2.hits.length === 1 && a2.hits[0].reasons.includes('yob')); ok('±1 yıl hoşgörüyle doğum yılı uyumlu → bonus');
+  const a3 = SEC.adjust({ id: 'c1', yob: '1980' }, h, { goodGuys: [{ customerId: 'c1', src: 'tr', entryId: 'X2' }] }); assert(a3.hits.length === 0 && a3.dropped[0].why === 'good_guy'); ok('good-guy çifti bastırılır');
+}
+
+/* ---- MASAK resmî CSV (cp1254, ';') ayrıştırıcı: dört bölüm ---- */
+{
+  const R2 = require('../lib/regional'); const fx2 = f => path.join(__dirname, 'fixtures', f);
+  for (const [k, minN] of [['A', 20], ['B', 20], ['C', 30], ['D', 20]]) {
+    const o = R2.parseMASAKcsv(fs.readFileSync(fx2('masak-' + k + '.csv')), k);
+    assert(o.length >= minN && o.every(e => e.s === 'tr' && e.n[0] && e.sect === k && e.prog)); assert(o.official === o.length);
+    ok('MASAK CSV bölüm ' + k + ': ' + o.length + ' kayıt, satır sayısı = ayrıştırılan');
+  }
+  const c = R2.parseMASAKcsv(fs.readFileSync(fx2('masak-C.csv')), 'C'); const e0 = c[0];
+  assert(e0.idno && /^\d{11}$/.test(e0.idno) && e0.dob && e0.mother && e0.father && e0.ref.startsWith('RG ')); ok('MASAK md.7: TCKN, doğum tarihi, anne/baba, RG referansı alanları');
+  assert(R2.masakCsvHref([{ content: { rendered: '<a href="https://ms.hmb.gov.tr/uploads/x/C-IC-DONDURMA-KARARI-6415-a.csv">c</a><a href="https://ms.hmb.gov.tr/uploads/x/B-YABANCI-6415-b.csv">b</a>' } }], 'B').endsWith('B-YABANCI-6415-b.csv')); ok('MASAK sayfa JSON → bölüme uyan CSV bağlantısı');
+}
+console.log(`\n${n} test geçti.`);
 })().catch(e => { console.error(e); process.exit(1); });

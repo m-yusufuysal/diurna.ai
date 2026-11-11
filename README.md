@@ -1,11 +1,22 @@
 # Diurna — Yaptırım ve Uyum İstihbarat Merkezi
 
 > **Bugün ne değişti. Şimdi ne yapmalı.**
-> Bankalar ve şubeler için (Türkiye ve Körfez) çok kiracılı, koltuk başı fiyatlı yaptırım/uyum konsolu: günlük bülten, müşteri tabanı tespiti (*base tespiti*), ticaret ve gemi kontrolü, muhabir banka DD, görevler, raporlar.
+> Bankalar ve şubeler için (Türkiye ve Körfez) çok kiracılı, yaptırım/uyum konsolu: günlük bülten, müşteri tabanı tespiti (*base tespiti*), ticaret ve gemi kontrolü, muhabir banka DD, görevler, raporlar.
 
 **Marka:** “Diurna” nihai ad olarak uygulanmıştır (Latince *diurna* = “günlük”; Roma'nın resmî günlük duyuruları *Acta Diurna*). Ad, açıklama, slogan, renkler ve logo **tek yerden** değişir: `config/brand.json` + `public/brand/`. Marka araştırması: `/workspace/brand-research.md` (ticari marka/alan adı taraması hukuki tescil görüşü değildir; kullanıma almadan önce yetkili vekile kontrol ettirin).
 
 > ⚠️ **Bu bir çalışan prototip/ürün iskeletidir.** Aşağıdaki “Yer tutucular ve sınırlar” bölümünü okuyun. Yaptırım verisi **uydurulmaz**: listeler resmî kaynaklardan canlı çekilir; DEMO kurumun müşteri/kullanıcı/görev verisi örnektir ve arayüzde “DEMO / ÖRNEK VERİ” olarak etiketlidir.
+
+## Platform sahibi ve hesap açma (faturalama YOK)
+
+Kamuya açık kendi kendine kayıt **yoktur**; yalnızca demo talep formu vardır (talepler Platform paneli → Demo talepleri). Hesapları platform sahibi açar:
+
+1. **Platform yöneticisi** ilk açılışta tohumlanır (`kullanıcı adı: platform`; geçici parola `data/state/platform-admin.txt`). İlk girişte parola değişimi + MFA kurulumu zorunludur; bu hesap kurum verilerine erişemez.
+2. **Platform paneli** (`#/platform`): kurum + ilk yönetici oluşturma (kullanıcı adı + rastgele geçici parola, bir kez gösterilir), **kullanıcı (koltuk) sınırı**, kullanıcı ekleme/parola sıfırlama, elle askıya alma/açma.
+3. **Zorunlu ilk giriş:** geçici parolayla girilen her hesap (kurum yöneticileri dahil) önce parolayı değiştirir, sonra MFA kurar; sunucu bu iki adım bitmeden başka hiçbir API'ye izin vermez.
+4. **Kullanıcı sınırı:** aktif kullanıcı sayısı kurum için tanımlı sınırı aşamaz; sınır aktif kullanıcı sayısının altına indirilemez. Sınır platform panelinden güncellenir.
+5. **Askıya alma:** yalnızca elle (Platform paneli → Askıya al / Aç): giriş reddedilir, açık oturumlar düşer.
+6. Tüm platform işlemleri `platform-audit.json` kaydına yazılır (Platform paneli → Denetim).
 
 ## 1. Kurulum ve çalıştırma (tek komut)
 
@@ -36,7 +47,9 @@ node server.js                # varsayılan http://127.0.0.1:3000
 | `UM_DATA_DIR` | Veri dizini (varsayılan `./data`) |
 | `UM_DATA_KEY` | **32 bayt** AES-256-GCM anahtarı (base64/hex). Yoksa yerel geliştirme anahtarı üretilir ve uyarı verilir |
 | `UM_FORCE_SECURE=1` | Çerezi `Secure` + `__Host-` önekli yapar, HSTS ekler (TLS arkasında) |
-| `UM_TRUST_PROXY=1` | `X-Forwarded-For/Proto` başlıklarına güven (ters vekil arkasında) |
+| `UM_TRUST_PROXY=1` | `X-Forwarded-For/Proto/Host`, `Forwarded: proto=`, `X-Forwarded-Ssl`, `CF-Visitor` başlıklarına güven (ters vekil/tünel arkasında; `run-forever.sh` varsayılan olarak açar). HTTPS algılanınca çerez otomatik `Secure` + `__Host-` olur |
+| `UM_ALLOWED_ORIGINS` | Ek izinli Origin host'ları (virgüllü). Origin denetimi Host, güvenilen vekilde `X-Forwarded-Host` ve bu listeyle eşleşir |
+| `UM_PLATFORM_EMAIL` / `UM_PLATFORM_PASSWORD` | Platform yöneticisinin e-postası ve geçici parolası. Verilmezse rastgele parola üretilir ve `data/state/platform-admin.txt` (0600) dosyasına yazılır |
 | `UM_SMTP_HOST/PORT/USER/PASS/FROM` | Gerçek e-posta için SMTP (nodemailer). Yoksa e-postalar **giden kutusuna** yazılır ve uygulama içinde önizlenir |
 | `UM_TZ` | Gün sınırı saat dilimi (varsayılan `Europe/Istanbul`) |
 | `UM_POLL_NEWS_MIN`, `UM_POLL_LISTS_MIN` | Haber (≥5 dk, varsayılan 10) ve tam liste (≥30 dk, varsayılan 60) yoklama sıklığı |
@@ -57,7 +70,7 @@ node server.js                # varsayılan http://127.0.0.1:3000
 ## 2. Ekranlar (7 ana menü)
 **Bugün** (kişisel “bugün senin için”: gelişmeler, yapılacaklar, izleme isabetleri, başlangıç ipuçları) · **Bülten** (TR/EN/AR taslak; iç ve iştirak versiyonu; “Base tespiti: var/yok”; dört göz onayı; HTML/yazdır/e-postaya kopyala; değiştirilemez arşiv + SHA-256) · **Kontrol** (müşteri tabanı CSV, toplu/tekil arama, ticaret GTİP-HS/IMO/FATF/sınır kapısı + analist notu, muhabir banka DD) · **Görevler** (SLA, yorum, çözüm gerekçesi, bildirimler) · **Raporlar** (analitik/KPI, ROI-tasarruf, şube raporu, denetim izi) · **Kaynaklar** (dizin, canlı kaynak durumu, FATF, sınır kapıları, ülke mevzuat katmanı) · **Yönetim** (kuruluş, kullanıcılar, şubeler, listeler + kurum içi engelleme listesi, mevzuat/veri yerleşimi, faturalama, entegrasyon: API/webhook, güvenlik). Kullanıcıya özel ayarlar **Ayarlarım**'da (bildirim kuralları, izleme listesi, günlük e-posta, MFA/parola/oturumlar).
 
-Herkese açık sayfalar: tanıtım/fiyat/güvenlik/demo talep (`#/`), **durum sayfası** (`#/durum`).
+Herkese açık sayfalar: tanıtım/güvenlik/demo talep (`#/`), **durum sayfası** (`#/durum`).
 
 ### CSV içe aktarma
 Şablon indirme → sürükle-bırak → **sütun eşleme** → satır bazlı doğrulama raporu (hata/uyarı) → içe aktarma. Toplu aramada sonuçlar CSV olarak indirilir (formül enjeksiyonu korumalı). Limitler: 10 MB, 20.000 satır; UTF-8/Windows-1254 algılanır.
@@ -146,7 +159,7 @@ Yönetim → Entegrasyon'da anahtar üretin (`Authorization: Bearer um_live_…`
 ## 8. Yer tutucular ve sınırlar (açık liste)
 - **Marka/ticari marka:** “Diurna” ad ve logosu henüz hukuki tescil kontrolünden geçmemiştir; yasal şirket adı, destek e-postası ve gönderen adresleri **yer tutucudur**.
 - **SSO (SAML/OIDC):** yalnızca ayar alanı; çalışmaz.
-- **Ödemeler (Stripe/iyzico):** yalnızca arayüz; gerçek tahsilat yok. **Fiyatlar (49/149 USD/koltuk) ve planlar yer tutucudur.** Faturalar “DEMO”.
+- **Faturalama / ödeme:** şu an kapsam dışıdır — arayüzde fatura, fiyat, plan veya ödeme ekranı yoktur ve kartla ödeme (Stripe/iyzico) hiç yoktur. Eski havale/EFT fatura modülünün arka uç kodu (`lib/owner.js`) varsayılan KAPALI olarak saklanır; yalnızca `UM_BILLING=1` ile arka uçta açılır (arayüzü yoktur).
 - **Körfez yerel listeleri:** yapılandırılmış liste çekimi yok; yalnızca düzenleyici/mevzuat katmanı + resmî sayfa **değişiklik izleme** (robots izin verirse). EOCN sayfası robots.txt ile otomasyonu yasakladığı için elle takip gerekir. Mevzuat özetleri hukuki görüş değildir; güncel metinden doğrulanmalıdır.
 - **MASAK:** resmî API yok; OpenSanctions yansısı lisans gerektirir (varsayılan kapalı).
 - **Dahili PEP veritabanı, sahiplik zincir grafı, ödeme mesajı (SWIFT/ISO 20022) ayrıştırma, AR/RU/ZH harf çevirisi, liste bazında eşik:** yok.

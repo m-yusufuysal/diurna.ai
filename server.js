@@ -17,7 +17,7 @@ const screening = require('./lib/screening');
 const I = require('./lib/i18n');
 const auth = require('./lib/auth');
 const work = require('./lib/work');
-const billing = require('./lib/billing'); const platform = require('./lib/platform');
+const SEC = require('./lib/secondary'); const reader = require('./lib/reader'); const billing = require('./lib/billing'); const platform = require('./lib/owner');
 const mailer = require('./lib/mailer');
 const seed = require('./lib/seed');
 const P = require('./lib/platform');
@@ -46,7 +46,7 @@ const isSecure = req => !!req.socket.encrypted || process.env.UM_FORCE_SECURE ==
 const originOk = req => { const o = req.headers.origin; if (!o) return true; let h; try { h = new URL(o).host; } catch { return false; } const ok = [req.headers.host]; if (TRUST()) ok.push(first(req.headers['x-forwarded-host'])); for (const x of String(process.env.UM_ALLOWED_ORIGINS || '').split(',')) if (x.trim()) ok.push(x.trim().replace(/^https?:\/\//, '')); return ok.includes(h); };
 const can = (u, what) => auth.can(u, what);
 function guard(u, what, res) { if (!can(u, what || 'write')) { send(res, 403, { error: 'role', message: `“${u.role}” rolünün bu işlem için yetkisi yok.` }); return false; } return true; }
-const PUBLIC_ROUTES = new Set(['GET /api/public/brand', 'POST /api/auth/login', 'POST /api/auth/logout', 'GET /api/public/status', 'POST /api/public/demo-request', 'GET /api/public/plans']);
+const PUBLIC_ROUTES = new Set(['GET /api/public/brand', 'POST /api/auth/login', 'POST /api/auth/mfa', 'POST /api/auth/logout', 'GET /api/public/status', 'POST /api/public/demo-request']);
 
 function sourceMeta() {
   const jobs = sched.snapshot(); const st = scan.sourceStatuses(); const lm = L.meta();
@@ -68,7 +68,7 @@ const R = (method, re, fn) => routes.push({ method, re, fn });
 
 R('GET', /^\/api\/status$/, async (req, res, m, q, u) => {
   const s = store.settings(); const lm = L.meta(); const live = scan.loadLive(); const org = store.orgsAll().find(o => o.id === u.orgId); const w = scan.orgWindow();
-  send(res, 200, { csrf: req.__session.csrf, session: { idleExp: req.__session.idleExp, exp: req.__session.exp }, now: new Date().toISOString(), today: w.end, window: w, sources: sourceMeta(), jobs: sched.snapshot(), health: require('./lib/health').summary(sched.snapshot()), customers: store.customers().meta, lists: lm, listTotal: L.totalCount(), user: auth.pub(u), org: { id: org.id, name: org.name, plan: org.plan, demo: !!org.demo, seats: org.seats }, billingAlert: ['Admin'].includes(u.role) ? platform.billingAlert(u.orgId) : null, roles: Object.keys(store.ROLES), perms: store.ROLES[u.role], settings: { ...s, smtp: undefined, security: u.role === 'Admin' ? s.security : { ...s.security, ipAllowlist: undefined } }, prefs: u.prefs,
+  send(res, 200, { csrf: req.__session.csrf, session: { idleExp: req.__session.idleExp, exp: req.__session.exp }, now: new Date().toISOString(), today: w.end, window: w, sources: sourceMeta(), jobs: sched.snapshot(), health: require('./lib/health').summary(sched.snapshot()), customers: store.customers().meta, lists: lm, listTotal: L.totalCount(), user: auth.pub(u), org: { id: org.id, name: org.name, plan: org.plan, demo: !!org.demo, seats: org.seats },  roles: Object.keys(store.ROLES), perms: store.ROLES[u.role], settings: { ...s, smtp: undefined, security: u.role === 'Admin' ? s.security : { ...s.security, ipAllowlist: undefined } }, prefs: u.prefs,
     fatf: T.fatf(), counts: { items: scan.items().length, notifications: work.userNotifs(u.id).filter(n => !n.read).length, tasks: store.tasks().filter(t => t.assignee === u.id && t.status !== 'closed').length }, liveUpdatedAt: live.updatedAt, version: require('./package.json').version, customersLoaded: C.has(), platform: { tz: P.tz, pollNewsMinutes: P.pollNewsMinutes, pollListsMinutes: P.pollListsMinutes, scanDays: P.scanDays } });
 });
 R('GET', /^\/api\/events$/, async (req, res, m, q, u) => { bus.add(res, { orgId: u.orgId, userId: u.id }); bus.emit('hello', { at: new Date().toISOString() }, { userId: u.id }); });
@@ -98,7 +98,6 @@ R('POST', /^\/api\/auth\/mfa$/, async (req, res) => {
 });
 R('POST', /^\/api\/auth\/logout$/, async (req, res) => { auth.logout(req); send(res, 200, { ok: true }, undefined, { 'Set-Cookie': auth.cookie('', 0, isSecure(req)) }); });
 R('GET', /^\/api\/public\/brand$/, async (req, res) => { const b = require('./lib/brand').get(); send(res, 200, { name: b.name, shortName: b.shortName, descriptor: b.descriptor, tagline: b.tagline, logo: b.logo, wordmark: b.wordmark, wordmarkLight: b.wordmarkLight, favicon: b.favicon, supportEmail: b.supportEmail, legalEntity: b.legalEntity }); });
-R('GET', /^\/api\/public\/plans$/, async (req, res) => send(res, 200, billing.PLANS));
 R('GET', /^\/api\/public\/status$/, async (req, res) => send(res, 200, publicStatus()));
 R('POST', /^\/api\/public\/demo-request$/, async (req, res) => {
   const b = await readBody(req); if (!b.email || !/^\S+@\S+\.\S+$/.test(b.email) || !b.name) return send(res, 422, { error: 'validation' });
@@ -153,6 +152,60 @@ R('POST', /^\/api\/org\/users$/, async (req, res, m, q, u) => {
   const pw = platform.tempPassword();
   try { const nu = await auth.createUser(u.orgId, { email: b.email, username: b.username || undefined, name: String(b.name).slice(0, 60), role: b.role, password: pw, branchId: b.branchId || null, mustChangePassword: true, mfaRequired: true }); store.logAudit(u, 'user.add', nu.email, nu.role); send(res, 200, { user: auth.pub(nu), tempPassword: pw }); } catch (e) { send(res, e.code === 'weak' || e.code === 'bad' ? 422 : 409, { error: e.code || 'dup', message: e.message, issues: e.issues }); }
 });
+R('PUT', /^\/api\/org\/users\/([\w-]+)$/, async (req, res, m, q, u) => {
+  if (!guard(u, 'users', res)) return; const b = await readBody(req); const us = store.authUsers(); const x = us.find(z => z.id === m[1] && z.orgId === u.orgId); if (!x) return send(res, 404, { error: 'not found' });
+  const self = x.id === u.id; const bl = billing.ensure(u.orgId);
+  if ('role' in b) { if (!store.ROLES[b.role] || b.role === 'Platform') return send(res, 422, { error: 'validation' }); if (self && b.role !== x.role) return send(res, 422, { error: 'self', message: 'Kendi rolünüzü değiştiremezsiniz.' }); x.role = b.role; }
+  if ('branchId' in b) x.branchId = b.branchId || null; if (b.name) x.name = String(b.name).slice(0, 60);
+  if ('active' in b) {
+    const on = !!b.active; if (self && !on) return send(res, 422, { error: 'self', message: 'Kendi hesabınızı pasifleştiremezsiniz.' });
+    if (on && !x.active && us.filter(z => z.orgId === u.orgId && z.active).length >= bl.seats) return send(res, 402, { error: 'seats', message: 'Sözleşmedeki koltuk sayısına ulaşıldı.' });
+    x.active = on; if (!on) auth.revokeAll(x.id);
+  }
+  store.saveAuthUsers(us); if (b.resetMfa) { auth.resetMfa(x.id); if (self) auth.revokeAll(x.id); }
+  store.logAudit(u, 'user.update', x.email, Object.keys(b).join(',')); send(res, 200, auth.pub(store.authUsers().find(z => z.id === x.id)));
+});
+// ── Çeviri (DeepL/Azure/Google/LibreTranslate veya LLM) ──
+const TRN = require('./lib/translate'); const ai = require('./lib/ai'); const EN = require('./lib/entities'); const WATCH = require('./lib/watch'); const FETCH = require('./lib/fetcher');
+R('GET', /^\/api\/translate\/info$/, async (req, res, m, q, u) => send(res, 200, { ...TRN.info(), aiStatus: ai.status() }));
+R('POST', /^\/api\/translate$/, async (req, res, m, q, u) => {
+  const lim = sec.rateLimit('tr:' + u.id, 60, 60e3); if (!lim.ok) return send(res, 429, { error: 'rate_limited' });
+  const b = await readBody(req);
+  try { const r = await TRN.translate(b.texts, b.target, ['news', 'regulation', 'dd', 'bulletin', 'task', 'note'].includes(b.kind) ? b.kind : 'news', { aiAllowed: ai.status().enabled }); store.logAudit(u, 'translate', String(b.kind || 'news'), `${r.provider}; ${r.items.length} metin → ${r.target}${r.ai ? '; yapay zekâ' : ''}`); send(res, 200, r); }
+  catch (e) { send(res, { confidential: 403, ai_disabled: 403, integrity: 502, not_configured: 503, lang: 422, size: 413 }[e.code] || 502, { error: e.code || 'provider', message: e.message }); }
+});
+// ── Yapay zekâ (insan onaylı, atıflı, denetim kayıtlı; kuruma göre kapatılabilir) ──
+R('GET', /^\/api\/ai\/status$/, async (req, res, m, q, u) => send(res, 200, ai.status()));
+R('GET', /^\/api\/ai\/log$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; let a = []; try { a = JSON.parse(fs.readFileSync(path.join(store.orgDir(), 'ai-log.json'), 'utf8')); } catch { } send(res, 200, a.slice(0, 100)); });
+const liveItem = id => scan.items({ all: true }).find(i => i.id === id);
+function aiRoute(kind, fn) {
+  R('POST', new RegExp('^\\/api\\/ai\\/' + kind + '$'), async (req, res, m, q, u) => {
+    const lim = sec.rateLimit('ai:' + u.id, 30, 60e3); if (!lim.ok) return send(res, 429, { error: 'rate_limited' }, undefined, { 'Retry-After': lim.retryAfter });
+    const b = await readBody(req); const lang = I.langs.includes(b.lang) ? b.lang : 'tr';
+    try { send(res, 200, await fn(u, b, lang)); } catch (e) { if (e.status) return send(res, e.status, { error: 'bad_request', message: e.message }); send(res, { ai_disabled: 403, not_configured: 503 }[e.code] || 502, { error: e.code || 'ai', message: e.message }); }
+  });
+}
+const need = (cond, msg) => { if (!cond) throw Object.assign(new Error(msg), { status: 422 }); };
+aiRoute('article', async (u, b, lang) => { need(b.id, 'id gerekli'); const it = scan.items({ all: true }).find(i => i.id === String(b.id)); need(it, 'öğe bulunamadı'); const a = await reader.getFor(it, { fetch: true }); const text = (a.paragraphs || []).join('\n') || a.excerpt; need(text && text.length > 80, 'Özetlenecek metin yok'); return ai.articleSummary({ user: u, item: it, article: text, lang }); });
+aiRoute('summary', async (u, b, lang) => { need(Array.isArray(b.ids), 'ids gerekli'); const all = scan.items({ all: true }); const by = new Map(all.map(i => [i.id, i])); const items = b.ids.slice(0, 20).map(id => by.get(String(id))).filter(Boolean); const r = await ai.summary({ user: u, items, lang }); return { ...r, idMap: Object.fromEntries(items.map((it, i) => ['n' + (i + 1), it.id])) }; });
+aiRoute('bulletin', async (u, b, lang) => { const item = liveItem(String(b.itemId || '')); need(item, 'Kalem bulunamadı'); return ai.bulletinDraft({ user: u, item, lang }); });
+aiRoute('regulation', async (u, b, lang) => { const item = liveItem(String(b.itemId || '')); need(item, 'Kalem bulunamadı'); return ai.regSummary({ user: u, item, lang }); });
+aiRoute('hit', async (u, b, lang) => { need(b.entry && typeof b.entry === 'object' && JSON.stringify(b).length < 12000, 'Geçersiz eşleşme verisi'); return ai.explainHit({ user: u, query: b.query || {}, entry: b.entry, score: b.score, reasons: (b.reasons || []).map(String).slice(0, 12), lang }); });
+aiRoute('dd', async (u, b, lang) => { const question = String(b.question || '').trim().slice(0, 600); need(question.length >= 8, 'Soru çok kısa'); return ai.ddDraft({ user: u, question, lang }); });
+aiRoute('trade', async (u, b, lang) => { need(b.check && typeof b.check === 'object' && JSON.stringify(b.check).length < 20000, 'Ticaret kontrolü verisi gerekli'); const result = T.assess(b.check, lang); return ai.tradeNote({ user: u, result, ref: String(b.check.ref || 'ticaret').slice(0, 60), lang }); });
+// ── Veri motoru: birleşik varlık deposu, sayfa izleme, nazik çekim ──
+R('GET', /^\/api\/entities\/stats$/, async (req, res) => send(res, 200, EN.stats()));
+R('GET', /^\/api\/entities\/feed$/, async (req, res, m, q) => send(res, 200, EN.feed({ since: String(q.since || ''), src: String(q.src || ''), kind: String(q.kind || ''), limit: Math.min(300, +q.limit || 100) })));
+R('GET', /^\/api\/entities$/, async (req, res, m, q) => send(res, 200, EN.search({ q: String(q.q || '').slice(0, 120), src: String(q.src || ''), type: String(q.type || ''), status: String(q.status || ''), programme: String(q.programme || ''), limit: Math.min(100, +q.limit || 30), offset: Math.max(0, +q.offset || 0) })));
+R('GET', /^\/api\/entities\/([^/]+)$/, async (req, res, m) => { const e = EN.get(m[1]); e ? send(res, 200, e) : send(res, 404, { error: 'not found' }); });
+R('GET', /^\/api\/reader\/([\w-]+)$/, async (req, res, m, q, u) => {
+  const lim = sec.rateLimit('reader:' + u.id, 40, 60e3); if (!lim.ok) return send(res, 429, { error: 'rate_limited' }, undefined, { 'Retry-After': lim.retryAfter });
+  const it = scan.items({ all: true }).find(i => i.id === m[1]); if (!it) return send(res, 404, { error: 'not found' });
+  send(res, 200, await reader.getFor(it, { fetch: q.fetch !== '0', force: q.force === '1' && can(u, 'write') }));
+});
+R('GET', /^\/api\/watch$/, async (req, res) => send(res, 200, WATCH.summary()));
+R('GET', /^\/api\/fetch\/stats$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; send(res, 200, { userAgent: FETCH.UA, fallbackOpenSanctions: process.env.UM_FALLBACK_OPENSANCTIONS === '1', hosts: FETCH.stats() }); });
+if (process.env.UM_BILLING === '1') { // Faturalama modülü varsayılan KAPALI (kapsam dışı); arka uç kodu yalnızca yeniden etkinleştirme için saklanır
 R('GET', /^\/api\/billing$/, async (req, res, m, q, u) => {
   if (!guard(u, 'billing', res)) return; const b = billing.ensure(u.orgId); const act = auth.orgUsers(u.orgId).filter(x => x.active).length; const usage = store.usage(); const P = platform.pdata();
   send(res, 200, { contract: { plan: b.plan, seats: b.seats, currency: b.currency, pricePerSeat: b.pricePerSeat, ...b.contract }, plans: billing.PLANS, activeSeats: act, monthly: billing.monthly(u.orgId), usage: usage[billing.monthKey()] || {}, usageHistory: usage, invoices: platform.invoicesOf(u.orgId).map(i => ({ ...i, history: undefined, reminders: undefined })), bank: P.bank, seller: { name: P.seller.name, email: P.seller.email }, graceDays: P.graceDays, alert: platform.billingAlert(u.orgId), suspended: b.status === 'suspended', note: 'Faturalama: kurumsal sözleşme + havale/EFT. Kartla ödeme yoktur; ödeme durumu Diurna tarafından manuel işaretlenir.' });
@@ -161,12 +214,13 @@ R('GET', /^\/api\/billing\/invoices\/([\w-]+)\/pdf$/, async (req, res, m, q, u) 
   if (!guard(u, 'billing', res)) return; const inv = platform.invoicesOf(u.orgId).find(i => i.id === m[1]); if (!inv) return send(res, 404, { error: 'not found' });
   const buf = await platform.invoicePdf(inv); res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${inv.number}.pdf"`, 'Cache-Control': 'no-store' }); res.end(buf);
 });
+}
 // ── Platform sahibi paneli (yalnızca "Platform" rolü) ──
 const pguard = (u, res) => { if (u.role !== 'Platform') { send(res, 403, { error: 'role', message: 'Yalnızca platform yöneticisi' }); return false; } return true; };
 const perr = (res, e) => send(res, { nf: 404, seats: 409, bad: 422, weak: 422 }[e.code] || 409, { error: e.code || 'error', message: e.message, issues: e.issues });
 R('GET', /^\/api\/platform\/overview$/, async (req, res, m, q, u) => {
-  if (!pguard(u, res)) return; const orgs = platform.listOrgs(); const inv = platform.invoices().map(platform.effective); const sum = st => inv.filter(i => i.status === st).reduce((a, i) => a + i.total, 0);
-  send(res, 200, { orgs, invoices: inv, totals: { orgs: orgs.length, seatsSold: orgs.reduce((a, o) => a + o.seats, 0), seatsUsed: orgs.reduce((a, o) => a + o.used, 0), suspended: orgs.filter(o => o.suspended).length, pending: Math.round(sum('bekliyor')), overdue: Math.round(sum('gecikti')), paid: Math.round(sum('odendi')) }, settings: platform.pdata(), demoRequests: store.global('demo-requests.json', []), plans: billing.PLANS, audit: store.global('platform-audit.json', []).slice(0, 100), now: new Date().toISOString() });
+  if (!pguard(u, res)) return; const orgs = platform.listOrgs();
+  send(res, 200, { orgs, totals: { orgs: orgs.length, seats: orgs.reduce((a, o) => a + o.seats, 0), seatsUsed: orgs.reduce((a, o) => a + o.used, 0), suspended: orgs.filter(o => o.suspended).length }, demoRequests: store.global('demo-requests.json', []), audit: store.global('platform-audit.json', []).slice(0, 100), now: new Date().toISOString() });
 });
 R('POST', /^\/api\/platform\/orgs$/, async (req, res, m, q, u) => { if (!pguard(u, res)) return; try { send(res, 200, await platform.createOrg(await readBody(req), u)); } catch (e) { perr(res, e); } });
 R('PUT', /^\/api\/platform\/orgs\/([\w-]+)$/, async (req, res, m, q, u) => { if (!pguard(u, res)) return; try { send(res, 200, platform.updateOrg(m[1], await readBody(req), u)); } catch (e) { perr(res, e); } });
@@ -174,6 +228,7 @@ R('POST', /^\/api\/platform\/orgs\/([\w-]+)\/suspend$/, async (req, res, m, q, u
 R('GET', /^\/api\/platform\/orgs\/([\w-]+)\/users$/, async (req, res, m, q, u) => { if (!pguard(u, res)) return; send(res, 200, auth.orgUsers(m[1]).map(auth.pub)); });
 R('POST', /^\/api\/platform\/orgs\/([\w-]+)\/users$/, async (req, res, m, q, u) => { if (!pguard(u, res)) return; try { send(res, 200, await platform.createUserFor(m[1], await readBody(req), u)); } catch (e) { perr(res, e); } });
 R('POST', /^\/api\/platform\/users\/([\w-]+)\/reset$/, async (req, res, m, q, u) => { if (!pguard(u, res)) return; try { send(res, 200, await platform.resetUser(m[1], u)); } catch (e) { perr(res, e); } });
+if (process.env.UM_BILLING === '1') { // Faturalama modülü varsayılan KAPALI (kapsam dışı); arka uç kodu yalnızca yeniden etkinleştirme için saklanır
 R('PUT', /^\/api\/platform\/settings$/, async (req, res, m, q, u) => {
   if (!pguard(u, res)) return; const b = await readBody(req); const P = platform.pdata(); const S = (o, ks) => Object.fromEntries(ks.filter(k => k in (o || {})).map(k => [k, String(o[k]).slice(0, 200)]));
   if (b.seller) P.seller = { ...P.seller, ...S(b.seller, ['name', 'address', 'taxOffice', 'taxNo', 'email', 'phone']) }; if (b.bank) P.bank = { ...P.bank, ...S(b.bank, ['bankName', 'accountHolder', 'iban', 'swift', 'branch']) };
@@ -192,6 +247,7 @@ R('GET', /^\/api\/platform\/invoices\/([\w-]+)\/pdf$/, async (req, res, m, q, u)
   const buf = await platform.invoicePdf(platform.effective(inv)); res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${inv.number}.pdf"`, 'Cache-Control': 'no-store' }); res.end(buf);
 });
 R('POST', /^\/api\/platform\/tick$/, async (req, res, m, q, u) => { if (!pguard(u, res)) return; platform.tick(); send(res, 200, { ok: true }); });
+}
 R('GET', /^\/api\/apikeys$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; send(res, 200, store.apiKeys().map(k => ({ id: k.id, name: k.name, prefix: k.prefix, createdAt: k.createdAt, lastUsed: k.lastUsed, revoked: !!k.revoked }))); });
 R('POST', /^\/api\/apikeys$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; const b = await readBody(req); const key = 'um_live_' + crypto.randomBytes(24).toString('base64url'); const ks = store.apiKeys(); const rec = { id: 'K' + U.uid().slice(0, 5), name: String(b.name || 'API').slice(0, 60), prefix: key.slice(0, 14), hash: U.sha256(key), createdAt: new Date().toISOString(), lastUsed: null, orgId: u.orgId }; ks.push(rec); store.saveApiKeys(ks); const idx = store.global('apikey-index.json', {}); idx[rec.hash] = { orgId: u.orgId, id: rec.id }; store.saveGlobal('apikey-index.json', idx); store.logAudit(u, 'apikey.create', rec.id, rec.name); send(res, 200, { ...rec, hash: undefined, key }); });
 R('DELETE', /^\/api\/apikeys\/([\w-]+)$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; const ks = store.apiKeys(); const k = ks.find(x => x.id === m[1]); if (k) { k.revoked = true; store.saveApiKeys(ks); const idx = store.global('apikey-index.json', {}); delete idx[k.hash]; store.saveGlobal('apikey-index.json', idx); store.logAudit(u, 'apikey.revoke', k.id, k.name); } send(res, 200, { ok: true }); });
@@ -201,9 +257,11 @@ R('DELETE', /^\/api\/webhooks\/([\w-]+)$/, async (req, res, m, q, u) => { if (!g
 R('POST', /^\/api\/webhooks\/([\w-]+)\/test$/, async (req, res, m, q, u) => { if (!guard(u, 'admin', res)) return; const h = store.webhooks().hooks.find(x => x.id === m[1]); if (!h) return send(res, 404, {}); send(res, 200, await work.deliver(u.orgId, h, 'test.ping', { hello: 'world' })); });
 
 // Bültenler
-R('GET', /^\/api\/bulletins$/, async (req, res) => send(res, 200, store.bulletins().map(b => ({ id: b.id, date: b.date, status: b.status, lang: b.lang, items: b.items.filter(i => i.included).length, createdAt: b.createdAt, createdBy: b.createdBy, approvals: b.approvals, overall: Bul.overallBase(b).state, contentHash: b.contentHash || null })).reverse()));
-R('GET', /^\/api\/bulletins\/today$/, async (req, res, m, q, u) => { const b = Bul.todayBulletin(u); store.saveBulletins(store.bulletins().map(x => x.id === b.id ? b : x)); send(res, 200, { ...b, errors: Bul.validateForApproval(b), overall: Bul.overallBase(b) }); });
-R('GET', /^\/api\/bulletins\/([\w-]+)$/, async (req, res, m) => { const b = store.bulletins().find(x => x.id === m[1]); if (!b) return send(res, 404, { error: 'not found' }); if (b.status === 'draft' && Bul.syncDraft(b)) store.saveBulletins(store.bulletins().map(x => x.id === b.id ? b : x)); send(res, 200, { ...b, errors: Bul.validateForApproval(b), overall: Bul.overallBase(b) }); });
+const affOnly = u => !!store.ROLES[u.role]?.affiliateOnly;   // Okuyucu / iştirak: yalnızca onaylı bültenin iştirak sürümü
+const affSlim = b => ({ id: b.id, date: b.date, status: b.status, lang: b.lang, items: b.items.filter(i => i.included).length, approvedAt: b.approvals?.at(-1)?.at || null, contentHash: b.contentHash || null, affiliateOnly: true });
+R('GET', /^\/api\/bulletins$/, async (req, res, m, q, u) => { const all = store.bulletins(); if (affOnly(u)) return send(res, 200, all.filter(b => b.status === 'approved').map(affSlim).reverse()); send(res, 200, all.map(b => ({ id: b.id, date: b.date, status: b.status, lang: b.lang, items: b.items.filter(i => i.included).length, createdAt: b.createdAt, createdBy: b.createdBy, approvals: b.approvals, overall: Bul.overallBase(b).state, contentHash: b.contentHash || null })).reverse()); });
+R('GET', /^\/api\/bulletins\/today$/, async (req, res, m, q, u) => { if (affOnly(u)) { const ap = store.bulletins().filter(b => b.status === 'approved'); const t0 = ap.find(b => b.date === U.todayISO()) || ap[ap.length - 1]; return send(res, 200, t0 ? { ...affSlim(t0), isToday: t0.date === U.todayISO() } : { none: true, affiliateOnly: true }); } const b = Bul.todayBulletin(u); store.saveBulletins(store.bulletins().map(x => x.id === b.id ? b : x)); send(res, 200, { ...b, errors: Bul.validateForApproval(b), overall: Bul.overallBase(b) }); });
+R('GET', /^\/api\/bulletins\/([\w-]+)$/, async (req, res, m, q, u) => { const b = store.bulletins().find(x => x.id === m[1]); if (!b) return send(res, 404, { error: 'not found' }); if (affOnly(u)) return b.status === 'approved' ? send(res, 200, affSlim(b)) : send(res, 403, { error: 'role', message: 'Bu bülten henüz onaylanmadı.' }); if (b.status === 'draft' && Bul.syncDraft(b)) store.saveBulletins(store.bulletins().map(x => x.id === b.id ? b : x)); send(res, 200, { ...b, errors: Bul.validateForApproval(b), overall: Bul.overallBase(b) }); });
 R('PUT', /^\/api\/bulletins\/([\w-]+)$/, async (req, res, m, q, u) => {
   if (!guard(u, 'write', res)) return;
   const all = store.bulletins(); const b = all.find(x => x.id === m[1]); if (!b) return send(res, 404, { error: 'not found' });
@@ -221,7 +279,7 @@ R('PUT', /^\/api\/bulletins\/([\w-]+)$/, async (req, res, m, q, u) => {
 R('POST', /^\/api\/bulletins\/([\w-]+)\/(submit|approve|reject|reopen)$/, async (req, res, m, q, u) => {
   const all = store.bulletins(); const b = all.find(x => x.id === m[1]); if (!b) return send(res, 404, { error: 'not found' });
   const act = m[2]; const body = await readBody(req); const s = store.settings();
-  if (act === 'submit') { if (!guard(u, 'write', res)) return; if (b.status !== 'draft') return send(res, 409, { error: 'state' }); b.status = 'review'; b.submittedBy = u.name; b.submittedAt = new Date().toISOString(); store.logAudit(u, 'bulletin.submit', b.id, 'İncelemeye gönderildi'); for (const mu of auth.orgUsers(u.orgId).filter(x => ['Admin', 'Uyum Yöneticisi'].includes(x.role) && x.id !== u.id)) work.notify(mu.id, 'bulletin_workflow', { title: `Bülten onay bekliyor · ${b.date}`, body: u.name, link: '#/bulten', refId: b.id + ':submit' }); }
+  if (act === 'submit') { if (!guard(u, 'write', res)) return; if (b.status !== 'draft') return send(res, 409, { error: 'state' }); if (Bul.syncDraft(b)) { /* taslak güncel olsun */ } const errs0 = Bul.validateForApproval(b); if (errs0.length) return send(res, 422, { error: 'validation', errors: errs0, message: errs0.some(e => e.code === 'empty') ? 'Boş bülten incelemeye gönderilemez: en az bir gelişme seçili olmalı.' : 'Bülten tamamlanmadan incelemeye gönderilemez (base tespiti eksik).' }); b.status = 'review'; b.submittedBy = u.name; b.submittedAt = new Date().toISOString(); store.logAudit(u, 'bulletin.submit', b.id, 'İncelemeye gönderildi'); for (const mu of auth.orgUsers(u.orgId).filter(x => ['Admin', 'Uyum Yöneticisi'].includes(x.role) && x.id !== u.id)) work.notify(mu.id, 'bulletin_workflow', { title: `Bülten onay bekliyor · ${b.date}`, body: u.name, link: '#/bulten', refId: b.id + ':submit' }); }
   if (act === 'approve') {
     if (!guard(u, 'approve', res)) return;
     if (b.status === 'approved') return send(res, 409, { error: 'state' });
@@ -240,7 +298,8 @@ R('POST', /^\/api\/bulletins\/([\w-]+)\/(submit|approve|reject|reopen)$/, async 
 });
 R('GET', /^\/api\/bulletins\/([\w-]+)\/render$/, async (req, res, m, q, u) => {
   const b = store.bulletins().find(x => x.id === m[1]); if (!b) return send(res, 404, { error: 'not found' });
-  const version = q.version === 'affiliate' ? 'affiliate' : 'internal'; const lang = I.langs.includes(q.lang) ? q.lang : b.lang; const fmt = q.format === 'text' ? 'text' : 'html';
+  const version = q.version === 'affiliate' ? 'affiliate' : 'internal';
+  if (affOnly(u) && (version !== 'affiliate' || b.status !== 'approved')) return send(res, 403, { error: 'role', message: 'Bu rol yalnızca onaylı bültenin iştirak sürümünü görüntüleyebilir.' }); const lang = I.langs.includes(q.lang) ? q.lang : b.lang; const fmt = q.format === 'text' ? 'text' : 'html';
   for (const [k, v] of Object.entries(sec.headers(false, 'frame'))) res.setHeader(k, v);
   let out;
   try { out = Bul.render(b, version, lang, fmt); } catch (e) { return send(res, 500, { error: 'render', message: e.message }); }
@@ -300,9 +359,25 @@ R('POST', /^\/api\/screen\/ownership$/, async (req, res, m, q, u) => {
   const level = direct >= 50 ? 'block' : direct >= 25 ? 'edd' : rows.some(r => r.hits.length) ? 'review' : 'clear';
   store.logAudit(u, 'screen.ownership', '', `sahip=${rows.length} toplam%=${direct} seviye=${level}`); send(res, 200, { rows, aggregatePct: direct, level, note: 'Pratik ilk sürüm: yalnızca girilen doğrudan/dolaylı pay yüzdeleri toplanır; sahiplik grafı (zincirleme çarpma) yoktur.' });
 });
+
+/* Good-guy (güvenilir) liste: müşteri × liste kaydı çifti, gerekçe ve onaylayan ile; denetim kaydı zorunlu */
+R('GET', /^\/api\/screen\/goodguys$/, (req, res, m, q, u) => send(res, 200, { items: store.settings().goodGuys || [] }));
+R('POST', /^\/api\/screen\/goodguys$/, async (req, res, m, q, u) => {
+  if (!guard(u, 'approve', res)) return; const b = await readBody(req);
+  if (!b.customerId || !b.src || !b.entryId || String(b.note || '').trim().length < 10) return send(res, 422, { error: 'bad_request', message: 'customerId, src, entryId ve en az 10 karakterlik gerekçe gerekli' });
+  const s = store.settings(); const gg = s.goodGuys || []; if (gg.some(g => g.customerId === b.customerId && g.src === b.src && g.entryId === b.entryId)) return send(res, 200, { items: gg });
+  gg.push({ customerId: String(b.customerId), src: String(b.src), entryId: String(b.entryId), customerName: String(b.customerName || '').slice(0, 120), entryName: String(b.entryName || '').slice(0, 120), note: String(b.note).slice(0, 400), by: u.name, at: new Date().toISOString() });
+  store.saveSettings({ ...s, goodGuys: gg }); store.logAudit(u, 'screen.goodguy.add', `${b.customerId}×${b.src}:${b.entryId}`, String(b.note).slice(0, 200)); send(res, 200, { items: gg });
+});
+R('DELETE', /^\/api\/screen\/goodguys\/(\d+)$/, (req, res, m, q, u) => {
+  if (!guard(u, 'approve', res)) return; const s = store.settings(); const gg = s.goodGuys || []; const g = gg[+m[1]]; if (!g) return send(res, 404, { error: 'not found' });
+  gg.splice(+m[1], 1); store.saveSettings({ ...s, goodGuys: gg }); store.logAudit(u, 'screen.goodguy.remove', `${g.customerId}×${g.src}:${g.entryId}`, ''); send(res, 200, { items: gg });
+});
 R('POST', /^\/api\/screen$/, async (req, res, m, q, u) => {
   const b = await readBody(req); const thr = +b.threshold || store.settings().matchThreshold;
-  const hits = L.orgIndex().search(b.name || '', { threshold: thr, limit: 12, imo: b.imo ? [String(b.imo).replace(/\D/g, '')] : undefined }).map(h => ({ score: h.score, reasons: h.reasons, how: h.type, entry: L.present(h.entry) }));
+  const cust = { id: '_q', taxId: b.taxId || b.id || '', yob: b.yob || b.dob || '' }; const cids = SEC.idsOf(cust); const lt = store.settings().listThresholds || {};
+  const raw = L.orgIndex().search(b.name || '', { threshold: thr, limit: 16, ids: cids.length ? cids : undefined, imo: b.imo ? [String(b.imo).replace(/\D/g, '')] : undefined });
+  const adj = SEC.adjust(cust, raw, { thresholdOf: s => lt[s] ?? thr }); const hits = adj.hits.slice(0, 12).map(h => ({ score: h.score, reasons: h.reasons, how: h.type, entry: L.present(h.entry) }));
   store.logAudit(u, 'screen.query', (b.name || b.imo || '').slice(0, 80), `${hits.length} sonuç`); send(res, 200, { hits, lists: L.meta() });
 });
 
@@ -340,6 +415,7 @@ R('PUT', /^\/api\/settings$/, async (req, res, m, q, u) => {
   num('lookbackDays', 1, 14); num('matchThreshold', 60, 100); num('policyReviewMonths', 1, 36); num('boardListMaxAgeMonths', 1, 36); num('shareholdingMaxAgeMonths', 1, 36);
   for (const k of ['institution', 'department', 'bulletinSignature']) if (k in b) s[k] = String(b[k]).slice(0, 120);
   if (Array.isArray(b.listsEnabled)) { const ok = b.listsEnabled.filter(x => Object.keys(L.DEFS).includes(x)); if (!ok.length) return send(res, 422, { error: 'lists', message: 'En az bir liste açık olmalı' }); s.listsEnabled = ok; setTimeout(() => screening.runAllOrgs(), 50); }
+  if (b.listThresholds && typeof b.listThresholds === 'object') { const lt = {}; for (const [k, v] of Object.entries(b.listThresholds)) if (L.DEFS[k] && v !== null && v !== '' && +v) lt[k] = Math.min(100, Math.max(60, Math.round(+v))); s.listThresholds = lt; store.logAudit(u, 'settings.listThresholds', '', Object.entries(lt).map(([k, v]) => k + '=' + v).join(', ') || 'varsayılan'); setTimeout(() => screening.runAllOrgs(), 50); }
   if (b.ai && 'enabled' in b.ai) { s.ai = { enabled: b.ai.enabled === null ? null : !!b.ai.enabled }; store.logAudit(u, 'settings.ai', '', 'Yapay zekâ (harici LLM) ayarı: ' + (s.ai.enabled === null ? 'varsayılan' : s.ai.enabled ? 'açık' : 'kapalı')); }
   if ('fourEyes' in b) s.fourEyes = !!b.fourEyes; if (b.defaultLang && I.langs.includes(b.defaultLang)) s.defaultLang = b.defaultLang;
   if (b.retention) for (const k of ['notificationsDays', 'outboxDays', 'auditYears', 'scansDays']) if (k in b.retention) s.retention[k] = Math.max(1, Math.min(3650, +b.retention[k] || 1));
@@ -401,7 +477,7 @@ R('PUT', /^\/api\/org\/branches$/, async (req, res, m, q, u) => {
   const orgs = store.orgs(); orgs.find(o => o.id === u.orgId).branches = clean; store.saveOrgs(orgs); store.logAudit(u, 'org.branches', '', `${clean.length} birim`); send(res, 200, { branches: clean });
 });
 R('GET', /^\/api\/roi$/, async (req, res, m, q, u) => {
-  const r = store.settings().roi; const b = billing.ensure(u.orgId); const an = work.analytics(); const sub = billing.monthly(u.orgId);
+  const r = store.settings().roi; const b = billing.ensure(u.orgId); const an = work.analytics(); const sub = null; /* faturalama kapsam dışı: abonelik bedeli ROI'ye katılmaz */
   const hoursSavedMonth = Math.max(0, (r.manualMinutesPerDay - r.autoMinutesPerDay)) * r.analysts * r.workdays / 60; const costSaved = hoursSavedMonth * r.hourlyCostUsd; const toolsMonthly = r.tools.reduce((a, t) => a + (t.annualUsd || 0), 0) / 12;
   send(res, 200, { inputs: r, measured: { bulletinMinutes: an.kpi.bulletinMinutes }, hoursSavedMonth: Math.round(hoursSavedMonth), costSavedMonth: Math.round(costSaved), toolsReplacedMonth: Math.round(toolsMonthly), subscriptionMonth: sub, netMonth: sub == null ? null : Math.round(costSaved + toolsMonthly - sub), roiMultiple: sub ? Math.round((costSaved + toolsMonthly) / sub * 10) / 10 : null, plan: b.plan, seats: b.seats, note: 'Tahmindir: değerler Ayarlar › Tasarruf alanındaki girdilerinize dayanır.' });
 });
@@ -457,7 +533,7 @@ server.listen(PORT, HOST, async () => {
   if (await seed.run()) console.log(`  DEMO verisi oluşturuldu (yalnızca ilk çalıştırma). Demo giriş: admin@demo-banka.example — parola README'de / UM_DEMO_PASSWORD ile değiştirilebilir.\n`);
   scan.loadLive(); sched.init(); setTimeout(() => { try { require('./lib/entities').ingestAll(); } catch (e) { console.error('entities', e.message); } }, 3000).unref(); setTimeout(() => { try { require('./lib/entities').ingestAll(); } catch (e) { console.error('entities', e.message); } }, 3000).unref();
   setTimeout(() => { try { screening.runAllOrgs(); } catch (e) { console.error('screening', e.message); } }, 8000).unref();
-  try { platform.tick(); } catch (e) { console.error('platform.tick', e.message); } setInterval(() => { try { platform.tick(); } catch (e) { console.error('platform.tick', e.message); } }, 3600e3).unref();
+  if (process.env.UM_BILLING === '1') { try { platform.tick(); } catch (e) { console.error('platform.tick', e.message); } setInterval(() => { try { platform.tick(); } catch (e) { console.error('platform.tick', e.message); } }, 3600e3).unref(); }
   setInterval(() => { try { work.dailyTick(); } catch (e) { console.error('dailyTick', e.message); } }, 60000).unref();
   setInterval(() => { for (const o of store.orgs()) store.runAs(o.id, () => { try { work.retention(); } catch { } }); }, 6 * 3600e3).unref();
 });

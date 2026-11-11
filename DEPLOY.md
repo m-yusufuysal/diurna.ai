@@ -43,3 +43,10 @@ Quick tunnel adresi her başlatmada değişir ve SLA'sızdır; yalnızca demo i�
 - Çıkış (egress) kuralı: `*.ofac.treas.gov, sanctionslist.fcdo.gov.uk, webgate.ec.europa.eu, scsanctions.un.org, data.trade.gov, www.international.gc.ca, www.sesam.search.admin.ch, www.federalregister.gov, data.opensanctions.org, api.gdeltproject.org, resmigazete.gov.tr` ve izlenen resmî sayfalar (`data/watch.json`).
 - Süreç yöneticisi: Docker `restart: unless-stopped` (compose) ya da systemd/pm2.
 - Veri yerleşimi: kurulumu hedef ülkede (TR/AE/SA…) barındırın; kurum bazında `dataResidency` ayarı yalnızca etiketler, fiziksel konumu siz seçersiniz.
+
+
+## Pinggy / Cloudflare tüneli arkasında çalıştırma (HTTPS)
+
+Tünel TLS'i kendisi sonlandırır ve istemci isteğini `http://localhost:3111`'e iletir. Uygulama bunu şu başlıklardan anlar (yalnızca `UM_TRUST_PROXY=1` iken): `X-Forwarded-Proto`/`X-Forwarded-Scheme`, `Forwarded: proto=https`, `X-Forwarded-Ssl: on`, `CF-Visitor`. HTTPS algılanınca oturum çerezi `__Host-um_sid; Secure; HttpOnly; SameSite=Strict` olur ve HSTS eklenir. `scripts/run-forever.sh` `UM_TRUST_PROXY=1` ile başlar. Tünel hiçbir proto başlığı göndermiyorsa `UM_FORCE_SECURE=1` verin.
+Origin denetimi (CSRF'e ek) `Host`, güvenilen vekilde `X-Forwarded-Host` veya `UM_ALLOWED_ORIGINS=ad.a.pinggy.link` ile eşleşmelidir; tünel Host'u `localhost`a yeniden yazıyorsa son ikisinden biri yeterlidir.
+Ücretsiz tüneller geçicidir (süre dolunca adres değişir); kalıcı kullanım için VPS + Docker veya adlandırılmış Cloudflare tüneli kullanın.
