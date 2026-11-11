@@ -1,4 +1,4 @@
-import { h, raw, t, L, rel, fmtDT, S, esc, api } from './core.js';
+import { h, raw, t, L, rel, fmtD, fmtDT, num, S, esc, api } from './core.js';
 /* Simgeler: Lucide (ISC lisansı), 24px ızgara, tutarlı 1.5 çizgi kalınlığı. */
 const P = d => raw(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`);
 export const icon = {
@@ -145,4 +145,28 @@ export function installAI() {
     } catch (err) { out.textContent = ''; const d = document.createElement('div'); d.className = 'ai-lab err'; d.textContent = err.message || t('ai.fail'); out.appendChild(d); }
     b.disabled = false; b.innerHTML = orig;
   }, true);
+}
+
+/* Uygulama içi okuyucu: öğenin TAM metni (sunucu önbelleği; düz metin paragraflar). Çevir + YZ özeti okuyucuda; “Orijinal kaynak” bağlantısı isteğe bağlıdır. */
+export const readBtn = (id, cls = 'pri') => h`<button class="btn sm ${cls}" type="button" data-read="${id}">${icon.doc || icon.ext} ${t('rd.read')}</button>`;
+let rdInstalled = false;
+export function installReader() {
+  if (rdInstalled) return; rdInstalled = true;
+  document.addEventListener('click', e => { const b = e.target.closest('[data-read]'); if (!b) return; e.preventDefault(); openReader(b.dataset.read); }, true);
+}
+export async function openReader(id) {
+  const shell = h`<div class="rd" data-trx="news"><div class="rd-head"><div class="row wrap"><span class="badge" id="rd-src"></span><span class="small muted" id="rd-date"></span><span class="sp"></span><a class="btn sm ghost" id="rd-orig" target="_blank" rel="noopener noreferrer" hidden>${icon.ext} ${t('rd.orig')}</a></div><h2 class="rd-title trx-src" id="rd-title">${t('rd.loading')}</h2></div><div data-ai-box class="rd-tools"><div class="row wrap">${trBtn()}${aiBtn('article', { id }, { label: t('rd.aiSum') })}<span class="sp"></span><span class="xs muted" id="rd-meta"></span></div></div><div id="rd-note"></div><div class="rd-body" id="rd-body"><div class="muted">${t('rd.loading')}</div></div></div>`;
+  modal(shell, [{ label: t('common.close'), value: true, cls: 'pri' }], { onOpen: async root => {
+    root.querySelector('.modal')?.classList.add('reader'); const q = sel => root.querySelector(sel);
+    try {
+      const a = await api('/reader/' + encodeURIComponent(id));
+      q('#rd-src').textContent = a.source || ''; q('#rd-date').textContent = a.date ? fmtD(a.date) : ''; q('#rd-title').textContent = a.title || ''; if (a.url) { const o = q('#rd-orig'); o.href = a.url; o.hidden = false; }
+      const body = q('#rd-body'); body.textContent = '';
+      if (a.status === 'full') { q('#rd-meta').textContent = `${t('rd.full')} · ${num(a.chars)} ${t('rd.chars')}${a.fetchedAt ? ' · ' + rel(a.fetchedAt) : ''}`; }
+      else { const n = q('#rd-note'); n.className = 'callout'; n.style.margin = '12px 0'; const b = document.createElement('b'); b.textContent = a.status === 'excerpt' ? t('rd.partial') : t('rd.failed'); const r = document.createElement('div'); r.className = 'small'; r.textContent = `${t('rd.reason')}: ${a.reason || '—'}`; n.append(b, r); }
+      const paras = a.paragraphs?.length ? a.paragraphs : (a.excerpt ? [a.excerpt] : []);
+      if (!paras.length) { body.textContent = t('rd.none'); return; }
+      for (const ptxt of paras.slice(0, 400)) { const p = document.createElement(ptxt.length < 120 && !/[.!?:;,]$/.test(ptxt) ? 'h4' : 'p'); p.className = 'trx-src rd-p'; p.textContent = ptxt; body.appendChild(p); }
+    } catch (err) { q('#rd-title').textContent = t('rd.failed'); q('#rd-body').textContent = err.message || ''; }
+  } });
 }

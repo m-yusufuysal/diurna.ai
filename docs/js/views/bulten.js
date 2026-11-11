@@ -4,7 +4,8 @@ const STEPS = ['draft', 'review', 'approved'];
 export default {
   async render(el, sub) {
     if (sub === 'arsiv') return archive(el);
-    const [b, live] = await Promise.all([api('/bulletins/today'), api('/items')]); const liveMap = new Map(live.items.map(i => [i.id, i]));
+    const b = await api('/bulletins/today'); if (b.affiliateOnly) return affiliateToday(el, b);
+    const live = await api('/items'); const liveMap = new Map(live.items.map(i => [i.id, i]));
     let ver = 'internal', lang = b.lang || S.lang; let cur = b;
     const locked = () => cur.status === 'approved'; const u = me();
     const save = debounce(async patch => { try { cur = await api('/bulletins/' + cur.id, { method: 'PUT', body: patch }); paintHead(); paintPreview(); } catch (e) { toast(t('common.error'), e.message); } }, 600);
@@ -57,7 +58,21 @@ export default {
   async live(type, el, sub) { if (['scan', 'lists'].includes(type) && !sub && !el.querySelector('textarea:focus,input:focus')) await this.render(el, sub); },
 };
 async function archive(el) {
-  const list = await api('/bulletins');
+  const list = await api('/bulletins'); const aff = list.length && list[0].affiliateOnly || me().role === 'Okuyucu';
   el.innerHTML = h`<div class="page-head"><div><div class="eyebrow">${t('nav.bulten')}</div><h1>${t('bul.tabArchive')}</h1><p>${t('bul.archSub')}</p></div></div>${tabsBar('#/bulten', [['', 'bul.tabToday'], ['arsiv', 'bul.tabArchive']], 'arsiv')}
-  <div class="card"><div class="card-b flush">${list.length ? h`<table class="tbl"><thead><tr><th>${t('common.date')}</th><th>${t('common.status')}</th><th>${t('bul.baseFinding')}</th><th>${t('bul.items')}</th><th>${t('bul.approvedBy')}</th><th>SHA-256</th><th></th></tr></thead><tbody>${list.map(b => h`<tr><td><b>${fmtD(b.date)}</b></td><td><span class="badge ${b.status === 'approved' ? 'ok' : b.status === 'review' ? 'warn' : ''}">${t('bul.st.' + b.status)}</span></td><td>${t('bul.base.' + (b.overall === 'var' ? 'var' : b.overall === 'yok' ? 'yok' : 'pending'))}</td><td>${b.items}</td><td class="small">${b.approvals.map(a => a.by).join(', ') || '—'}</td><td class="mono xs">${b.contentHash?.slice(0, 12) || '—'}</td><td class="right nowrap"><a class="btn sm" target="_blank" href="/api/bulletins/${b.id}/render?version=internal&format=html">${t('bul.v.internal')}</a> <a class="btn sm" target="_blank" href="/api/bulletins/${b.id}/render?version=affiliate&format=html">${t('bul.v.affiliate')}</a></td></tr>`)}</tbody></table>` : emptyState('bul.archEmptyT', 'bul.archEmptyD', h`<a class="btn pri" href="#/bulten">${t('today.prepBulletin')}</a>`)}</div></div>`.toString();
+  <div class="card"><div class="card-b flush">${list.length ? h`<table class="tbl"><thead><tr><th>${t('common.date')}</th><th>${t('common.status')}</th>${aff ? '' : h`<th>${t('bul.baseFinding')}</th>`}<th>${t('bul.items')}</th><th>${t('bul.approvedBy')}</th><th>SHA-256</th><th></th></tr></thead><tbody>${list.map(b => h`<tr><td><b>${fmtD(b.date)}</b></td><td><span class="badge ${b.status === 'approved' ? 'ok' : b.status === 'review' ? 'warn' : ''}">${t('bul.st.' + b.status)}</span></td>${aff ? '' : h`<td>${t('bul.base.' + (b.overall === 'var' ? 'var' : b.overall === 'yok' ? 'yok' : 'pending'))}</td>`}<td>${b.items}</td><td class="small">${aff ? (b.approvedAt ? fmtDT(b.approvedAt) : '—') : b.approvals.map(a => a.by).join(', ') || '—'}</td><td class="mono xs">${b.contentHash?.slice(0, 12) || '—'}</td><td class="right nowrap">${aff ? '' : h`<a class="btn sm" target="_blank" href="/api/bulletins/${b.id}/render?version=internal&format=html">${t('bul.v.internal')}</a> `}<a class="btn sm" target="_blank" href="/api/bulletins/${b.id}/render?version=affiliate&format=html">${t('bul.v.affiliate')}</a></td></tr>`)}</tbody></table>` : emptyState('bul.archEmptyT', 'bul.archEmptyD', h`<a class="btn pri" href="#/bulten">${t('today.prepBulletin')}</a>`)}</div></div>`.toString();
+}
+
+/* Okuyucu / iştirak rolü: yalnızca ONAYLI bültenin iştirak sürümü. İç sürüm ve base tespiti hiç yüklenmez (sunucu da 403 verir). */
+async function affiliateToday(el, b) {
+  let lang = b.lang || S.lang;
+  const draw = () => {
+    el.innerHTML = h`<div class="page-head"><div><div class="eyebrow">${t('nav.bulten')}</div><h1>${t('bul.affTitle')}</h1><p>${t('bul.affSub')}</p></div></div>${tabsBar('#/bulten', [['', 'bul.tabToday'], ['arsiv', 'bul.tabArchive']], '')}
+    ${b.none ? emptyState('bul.affNoneT', 'bul.affNoneD') : h`<div class="row wrap" style="margin-bottom:10px"><span class="badge ok">${t('bul.st.approved')}</span><span class="small muted">${fmtD(b.date)}${b.isToday ? '' : ' · ' + t('bul.affOlder')}</span><span class="sp"></span><div class="seg2">${['tr', 'en', 'ar'].map(l => h`<button class="chip ${lang === l ? 'on' : ''}" data-bl="${l}">${l.toUpperCase()}</button>`)}</div> <button class="btn" id="exp">${icon.dl} ${t('bul.exportHtml')}</button><button class="btn" id="prt">${icon.print} ${t('bul.print')}</button></div>
+    <iframe class="prev" style="width:100%;min-height:70vh" sandbox="allow-same-origin allow-modals" title="preview" src="/api/bulletins/${b.id}/render?version=affiliate&lang=${lang}&format=html"></iframe>`}`.toString();
+    el.querySelectorAll('[data-bl]').forEach(x => x.onclick = () => { lang = x.dataset.bl; draw(); });
+    el.querySelector('#exp')?.addEventListener('click', async () => { const html = await api(`/bulletins/${b.id}/render?version=affiliate&lang=${lang}&format=html&log=1`); down(`bulten-${b.date}-affiliate-${lang}.html`, html, 'text/html'); });
+    el.querySelector('#prt')?.addEventListener('click', () => el.querySelector('iframe.prev')?.contentWindow?.print());
+  };
+  draw();
 }

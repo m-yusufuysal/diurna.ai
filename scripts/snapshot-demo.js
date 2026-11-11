@@ -42,6 +42,8 @@ async function get(p, key) { const r = await call('GET', p); if (r && r.__status
     '/trade/meta', '/trade/notes', '/dd', '/sources', '/fatf', '/audit', '/settings/full', '/blocklist', '/reference', '/org/branches', '/roi', '/docs', '/outbox', '/apikeys', '/webhooks',
     '/me/watchlist', '/me/security', '/public/brand', '/public/status', '/watch', '/fetch/stats', '/translate/info', '/ai/status', '/ai/log', '/entities/stats', '/entities/feed?limit=40',
     '/me/report?lang=tr', '/me/report?lang=en', '/me/report?lang=ar']) await get(p);
+  /* okuyucu paneli: öğelerin tam metni (sunucu önbelleği; saniyede sınırlı) */
+  for (const it of ((out['/items'] || {}).items || []).slice(0, 36)) await get('/reader/' + it.id);
   const bl = out['/bulletins'] || [];
   for (const b of bl.slice(0, 12)) {
     await get('/bulletins/' + b.id);
@@ -59,8 +61,8 @@ async function get(p, key) { const r = await call('GET', p); if (r && r.__status
     if (!out['/entities/feed?limit=40']) out['/entities/feed?limit=40'] = E.feed({ limit: 40 });
   } catch (e) { console.log('  – entities:', e.message); }
   try { if (!out['/watch']) out['/watch'] = require(path.join(SRC, 'lib', 'watch')).summary(); } catch (e) { console.log('  – watch:', e.message); }
-  out['/translate/info'] = { configured: true, provider: 'demo', ai: false, selfHosted: false, demo: true };
-  out['/ai/status'] = { enabled: false, configured: false, setting: null, demo: true };
+  out['/translate/info'] = { configured: false, provider: 'none', ai: false, selfHosted: false };
+  out['/ai/status'] = { enabled: false, configured: false, setting: null };
   out['/ai/log'] = [];
   out['/fetch/stats'] = out['/fetch/stats'] || { userAgent: 'Diurna/2 (+compliance-monitor)', fallbackOpenSanctions: true, hosts: [] };
 

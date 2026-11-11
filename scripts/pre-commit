@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Diurna pre-commit: (1) yasaklı dosyalar, (2) gitleaks (staged), (3) hızlı regex yedeği (gitleaks yoksa).
+# Kurulum:  cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit     (veya: git config core.hooksPath scripts/githooks)
+# Atlatmak (--no-verify) CI'da yine yakalanır; kullanmayın.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+RED=$'\e[31m'; NC=$'\e[0m'; fail=0
+
+# 1) Asla commit edilmeyecek dosyalar
+BLOCK='(^|/)(\.datakey|\.env(\..*)?|platform-admin\.txt|users\.json|sessions\.json|apikey-index\.json|ai-log\.json|.*\.(pem|key|p12|pfx|jks|kdbx))$|(^|/)data/(state|cache)/'
+bad=$(git diff --cached --name-only --diff-filter=ACMR | grep -E "$BLOCK" || true)
+if [ -n "$bad" ]; then echo "${RED}✘ Yasaklı dosya commit edilmek üzere:${NC}"; echo "$bad"; fail=1; fi
+
+# 2) Büyük dosyalar (>5 MB) — yanlışlıkla veri yedeği eklenmesine karşı
+while IFS= read -r f; do [ -f "$f" ] && [ "$(wc -c <"$f")" -gt 5242880 ] && case "$f" in docs/demo/data/*|data/*.json|*.woff2|*.ttf|*.png) ;; *) echo "${RED}✘ >5MB dosya: $f${NC}"; fail=1;; esac; done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+# 3) gitleaks
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks git --staged --redact --no-banner -c .gitleaks.toml || { echo "${RED}✘ gitleaks sır buldu. Değeri kaldırın; gerçekse ANINDA döndürün (SECURITY.md → Sır döndürme).${NC}"; fail=1; }
+else
+  echo "⚠ gitleaks kurulu değil (brew install gitleaks / https://github.com/gitleaks/gitleaks) — yedek regex taraması çalışıyor"
+  if git diff --cached -U0 | grep -E '^\+' | grep -Eq '(ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|um_live_[A-Za-z0-9_-]{20,}|\$argon2id\$)'; then echo "${RED}✘ Olası sır bulundu${NC}"; fail=1; fi
+fi
+[ "$fail" -eq 0 ] || exit 1

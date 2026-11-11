@@ -9,8 +9,7 @@ export default {
       ${err ? h`<div class="callout err" style="margin-bottom:14px">${err}</div>` : ''}
       <form id="lf" class="stack" autocomplete="on">${ticket ? h`<div><label class="f">${t('login.code')}</label><input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" autofocus maxlength="12" placeholder="123456"><div class="hint">${t('login.recoveryHint')}</div></div>` : h`<div><label class="f">${t('login.email')}</label><input type="text" name="email" autocomplete="username" autofocus></div><div><label class="f">${t('login.password')}</label><input type="password" name="password" autocomplete="current-password" ></div>`}
         <button class="btn pri" type="submit" style="justify-content:center">${t('login.submit')}</button></form>
-      <div class="hint" style="margin-top:14px">${t('login.sso')} <span class="tag">SAML 2.0 / OIDC — ${t('common.placeholder')}</span></div>
-      ${!ticket ? h`<div class="callout info" style="margin-top:18px"><b>${t('login.demoTitle')}</b><div class="small">${t('login.demoText')}</div></div>` : ''}</div></div></div>`.toString();
+      <div class="hint" style="margin-top:14px">${t('login.sso')} <span class="tag">SAML 2.0 / OIDC — ${t('common.placeholder')}</span></div></div></div></div>`.toString();
       el.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { setLang(b.dataset.lang); draw(); });
       el.querySelector('#lf').onsubmit = async e => {
         e.preventDefault(); const f = Object.fromEntries(new FormData(e.target)); const btn = e.target.querySelector('button'); btn.disabled = true;

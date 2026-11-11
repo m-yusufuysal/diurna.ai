@@ -254,6 +254,69 @@
       "tr": "UM_INTERPOL=1 ile açılır; API 403 verirse elle sorgulayın.",
       "en": "Enable with UM_INTERPOL=1; if the API returns 403, query manually."
      }
+    },
+    {
+     "name": "Avustralya DFAT – Konsolide Yaptırım Listesi (xlsx)",
+     "url": "https://www.dfat.gov.au/international-relations/security/sanctions/consolidated-list",
+     "auto": "live",
+     "scope": {
+      "tr": "Resmî xlsx indirilir ve ayrıştırılır; alınamazsa OpenSanctions au_dfat_sanctions yedeği kullanılır (kayıtta ‘yedek’ etiketi). Yedek için OpenSanctions yansısıdır; ticari kullanım OpenSanctions lisansı gerektirir (UM_OPENSANCTIONS_REGIONAL=0 ile kapatılır).",
+      "en": "Official xlsx is downloaded and parsed; if unavailable the OpenSanctions au_dfat_sanctions fallback is used (entries tagged ‘fallback’). For the fallback: OpenSanctions mirror; commercial use requires an OpenSanctions licence (disable with UM_OPENSANCTIONS_REGIONAL=0)."
+     }
+    },
+    {
+     "name": "Japonya MOF – Varlık dondurma hedef listesi (xlsx)",
+     "url": "https://www.mof.go.jp/policy/international_policy/gaitame_kawase/gaitame/economic_sanctions/list.html",
+     "auto": "live",
+     "scope": {
+      "tr": "Resmî sayfadaki güncel xlsx bağlantısı bulunup ayrıştırılır (program başına sayfa, İngilizce ad + takma adlar); alınamazsa OpenSanctions jp_mof_sanctions yedeği. OpenSanctions yansısıdır; ticari kullanım OpenSanctions lisansı gerektirir (UM_OPENSANCTIONS_REGIONAL=0 ile kapatılır).",
+      "en": "The current xlsx link on the official page is discovered and parsed (one sheet per programme, English names + aliases); falls back to OpenSanctions jp_mof_sanctions. OpenSanctions mirror; commercial use requires an OpenSanctions licence (disable with UM_OPENSANCTIONS_REGIONAL=0)."
+     }
+    },
+    {
+     "name": "BAE Yerel Terör Listesi (EOCN) – OpenSanctions ae_local_terrorists",
+     "url": "https://www.opensanctions.org/datasets/ae_local_terrorists/",
+     "auto": "live",
+     "scope": {
+      "tr": "Resmî kurum makine-okunur dosya yayımlamaz; yapılandırılmış yansı kullanılır. OpenSanctions yansısıdır; ticari kullanım OpenSanctions lisansı gerektirir (UM_OPENSANCTIONS_REGIONAL=0 ile kapatılır).",
+      "en": "The authority publishes no machine-readable file; a structured mirror is used. OpenSanctions mirror; commercial use requires an OpenSanctions licence (disable with UM_OPENSANCTIONS_REGIONAL=0)."
+     }
+    },
+    {
+     "name": "Katar NCTC – OpenSanctions qa_nctc_sanctions",
+     "url": "https://www.opensanctions.org/datasets/qa_nctc_sanctions/",
+     "auto": "live",
+     "scope": {
+      "tr": "Resmî kurum makine-okunur dosya yayımlamaz. OpenSanctions yansısıdır; ticari kullanım OpenSanctions lisansı gerektirir (UM_OPENSANCTIONS_REGIONAL=0 ile kapatılır).",
+      "en": "No official machine-readable file. OpenSanctions mirror; commercial use requires an OpenSanctions licence (disable with UM_OPENSANCTIONS_REGIONAL=0)."
+     }
+    },
+    {
+     "name": "Suudi Arabistan Ulusal Terör Listesi – OpenSanctions sa_pcct_terrorism_list",
+     "url": "https://www.opensanctions.org/datasets/sa_pcct_terrorism_list/",
+     "auto": "live",
+     "scope": {
+      "tr": "Resmî kurum makine-okunur dosya yayımlamaz. OpenSanctions yansısıdır; ticari kullanım OpenSanctions lisansı gerektirir (UM_OPENSANCTIONS_REGIONAL=0 ile kapatılır).",
+      "en": "No official machine-readable file. OpenSanctions mirror; commercial use requires an OpenSanctions licence (disable with UM_OPENSANCTIONS_REGIONAL=0)."
+     }
+    },
+    {
+     "name": "Bahreyn (CBB / Ulusal liste) – yer tutucu",
+     "url": "https://www.cbb.gov.bh/",
+     "auto": "link",
+     "scope": {
+      "tr": "Bahreyn için makine-okunur kamu yaptırım dosyası ve OpenSanctions veri kümesi YOKTUR: yalnızca resmî sayfa izlenir (değişiklik uyarısı), liste eşleştirmesi yapılmaz.",
+      "en": "No machine-readable public Bahrain sanctions file or OpenSanctions dataset exists: only the official page is monitored (change alerts); no list matching."
+     }
+    },
+    {
+     "name": "Kurum içi PEP seçeneği – OpenSanctions peps",
+     "url": "https://www.opensanctions.org/datasets/peps/",
+     "auto": "optional",
+     "scope": {
+      "tr": "Varsayılan KAPALI (UM_OPENSANCTIONS_PEP=1, ~180 MB). PEP kayıtları yaptırım değildir; ‘PEP’ etiketiyle ayrı kaynak olarak gelir. OpenSanctions yansısıdır; ticari kullanım OpenSanctions lisansı gerektirir (UM_OPENSANCTIONS_REGIONAL=0 ile kapatılır).",
+      "en": "Off by default (UM_OPENSANCTIONS_PEP=1, ~180 MB). PEP records are not sanctions; shown as a separate ‘PEP’ source. OpenSanctions mirror; commercial use requires an OpenSanctions licence (disable with UM_OPENSANCTIONS_REGIONAL=0)."
+     }
     }
    ]
   },
@@ -267,8 +330,8 @@
      "url": "https://masak.hmb.gov.tr/bkk-ile-malvarliklari-dondurulanlar",
      "auto": "link",
      "scope": {
-      "tr": "Resmî API yoktur; Excel/CSV bağlantıları değişir. Resmî sayfa bağlantı olarak verilir; yapılandırılmış yansı için OpenSanctions tr_fcib (ticari lisans gerekir, varsayılan KAPALI).",
-      "en": "No official API; Excel/CSV links change. Official page is linked; for a structured mirror use OpenSanctions tr_fcib (commercial licence required, OFF by default)."
+      "tr": "Resmî API yoktur; Excel/CSV bağlantıları değişir. Resmî sayfa bağlantı olarak verilir; yapılandırılmış veri OpenSanctions tr_fcib yansısından VARSAYILAN AÇIK alınır (ticari kullanım OpenSanctions lisansı gerektirir; UM_OPENSANCTIONS_TR=0 ile kapatılır).",
+      "en": "No official API; Excel/CSV links change. The official page is linked; structured data is taken from the OpenSanctions tr_fcib mirror, ON by default (commercial use requires an OpenSanctions licence; disable with UM_OPENSANCTIONS_TR=0)."
      }
     },
     {
@@ -283,10 +346,10 @@
     {
      "name": "OpenSanctions – tr_fcib (MASAK yansısı)",
      "url": "https://www.opensanctions.org/datasets/tr_fcib/",
-     "auto": "optional",
+     "auto": "live",
      "scope": {
-      "tr": "Günlük yapılandırılmış veri. Ticari ürün içinde kullanım için OpenSanctions lisansı gerekir.",
-      "en": "Daily structured data. A commercial OpenSanctions licence is required for use inside a paid product."
+      "tr": "Günlük yapılandırılmış veri, varsayılan açık. Ticari ürün içinde kullanım için OpenSanctions lisansı gerekir.",
+      "en": "Daily structured data, on by default. A commercial OpenSanctions licence is required inside a paid product."
      }
     }
    ]

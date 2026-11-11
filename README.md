@@ -1,11 +1,22 @@
 # Diurna — Yaptırım ve Uyum İstihbarat Merkezi
 
 > **Bugün ne değişti. Şimdi ne yapmalı.**
-> Bankalar ve şubeler için (Türkiye ve Körfez) çok kiracılı, koltuk başı fiyatlı yaptırım/uyum konsolu: günlük bülten, müşteri tabanı tespiti (*base tespiti*), ticaret ve gemi kontrolü, muhabir banka DD, görevler, raporlar.
+> Bankalar ve şubeler için (Türkiye ve Körfez) çok kiracılı, yaptırım/uyum konsolu: günlük bülten, müşteri tabanı tespiti (*base tespiti*), ticaret ve gemi kontrolü, muhabir banka DD, görevler, raporlar.
 
 **Marka:** “Diurna” nihai ad olarak uygulanmıştır (Latince *diurna* = “günlük”; Roma'nın resmî günlük duyuruları *Acta Diurna*). Ad, açıklama, slogan, renkler ve logo **tek yerden** değişir: `config/brand.json` + `public/brand/`. Marka araştırması: `/workspace/brand-research.md` (ticari marka/alan adı taraması hukuki tescil görüşü değildir; kullanıma almadan önce yetkili vekile kontrol ettirin).
 
 > ⚠️ **Bu bir çalışan prototip/ürün iskeletidir.** Aşağıdaki “Yer tutucular ve sınırlar” bölümünü okuyun. Yaptırım verisi **uydurulmaz**: listeler resmî kaynaklardan canlı çekilir; DEMO kurumun müşteri/kullanıcı/görev verisi örnektir ve arayüzde “DEMO / ÖRNEK VERİ” olarak etiketlidir.
+
+## Platform sahibi ve hesap açma (faturalama YOK)
+
+Kamuya açık kendi kendine kayıt **yoktur**; yalnızca demo talep formu vardır (talepler Platform paneli → Demo talepleri). Hesapları platform sahibi açar:
+
+1. **Platform yöneticisi** ilk açılışta tohumlanır (`kullanıcı adı: platform`; geçici parola `data/state/platform-admin.txt`). İlk girişte parola değişimi + MFA kurulumu zorunludur; bu hesap kurum verilerine erişemez.
+2. **Platform paneli** (`#/platform`): kurum + ilk yönetici oluşturma (kullanıcı adı + rastgele geçici parola, bir kez gösterilir), **kullanıcı (koltuk) sınırı**, kullanıcı ekleme/parola sıfırlama, elle askıya alma/açma.
+3. **Zorunlu ilk giriş:** geçici parolayla girilen her hesap (kurum yöneticileri dahil) önce parolayı değiştirir, sonra MFA kurar; sunucu bu iki adım bitmeden başka hiçbir API'ye izin vermez.
+4. **Kullanıcı sınırı:** aktif kullanıcı sayısı kurum için tanımlı sınırı aşamaz; sınır aktif kullanıcı sayısının altına indirilemez. Sınır platform panelinden güncellenir.
+5. **Askıya alma:** yalnızca elle (Platform paneli → Askıya al / Aç): giriş reddedilir, açık oturumlar düşer.
+6. Tüm platform işlemleri `platform-audit.json` kaydına yazılır (Platform paneli → Denetim).
 
 ## 1. Kurulum ve çalıştırma (tek komut)
 
@@ -36,7 +47,9 @@ node server.js                # varsayılan http://127.0.0.1:3000
 | `UM_DATA_DIR` | Veri dizini (varsayılan `./data`) |
 | `UM_DATA_KEY` | **32 bayt** AES-256-GCM anahtarı (base64/hex). Yoksa yerel geliştirme anahtarı üretilir ve uyarı verilir |
 | `UM_FORCE_SECURE=1` | Çerezi `Secure` + `__Host-` önekli yapar, HSTS ekler (TLS arkasında) |
-| `UM_TRUST_PROXY=1` | `X-Forwarded-For/Proto` başlıklarına güven (ters vekil arkasında) |
+| `UM_TRUST_PROXY=1` | `X-Forwarded-For/Proto/Host`, `Forwarded: proto=`, `X-Forwarded-Ssl`, `CF-Visitor` başlıklarına güven (ters vekil/tünel arkasında; `run-forever.sh` varsayılan olarak açar). HTTPS algılanınca çerez otomatik `Secure` + `__Host-` olur |
+| `UM_ALLOWED_ORIGINS` | Ek izinli Origin host'ları (virgüllü). Origin denetimi Host, güvenilen vekilde `X-Forwarded-Host` ve bu listeyle eşleşir |
+| `UM_PLATFORM_EMAIL` / `UM_PLATFORM_PASSWORD` | Platform yöneticisinin e-postası ve geçici parolası. Verilmezse rastgele parola üretilir ve `data/state/platform-admin.txt` (0600) dosyasına yazılır |
 | `UM_SMTP_HOST/PORT/USER/PASS/FROM` | Gerçek e-posta için SMTP (nodemailer). Yoksa e-postalar **giden kutusuna** yazılır ve uygulama içinde önizlenir |
 | `UM_TZ` | Gün sınırı saat dilimi (varsayılan `Europe/Istanbul`) |
 | `UM_POLL_NEWS_MIN`, `UM_POLL_LISTS_MIN` | Haber (≥5 dk, varsayılan 10) ve tam liste (≥30 dk, varsayılan 60) yoklama sıklığı |
@@ -57,7 +70,7 @@ node server.js                # varsayılan http://127.0.0.1:3000
 ## 2. Ekranlar (7 ana menü)
 **Bugün** (kişisel “bugün senin için”: gelişmeler, yapılacaklar, izleme isabetleri, başlangıç ipuçları) · **Bülten** (TR/EN/AR taslak; iç ve iştirak versiyonu; “Base tespiti: var/yok”; dört göz onayı; HTML/yazdır/e-postaya kopyala; değiştirilemez arşiv + SHA-256) · **Kontrol** (müşteri tabanı CSV, toplu/tekil arama, ticaret GTİP-HS/IMO/FATF/sınır kapısı + analist notu, muhabir banka DD) · **Görevler** (SLA, yorum, çözüm gerekçesi, bildirimler) · **Raporlar** (analitik/KPI, ROI-tasarruf, şube raporu, denetim izi) · **Kaynaklar** (dizin, canlı kaynak durumu, FATF, sınır kapıları, ülke mevzuat katmanı) · **Yönetim** (kuruluş, kullanıcılar, şubeler, listeler + kurum içi engelleme listesi, mevzuat/veri yerleşimi, faturalama, entegrasyon: API/webhook, güvenlik). Kullanıcıya özel ayarlar **Ayarlarım**'da (bildirim kuralları, izleme listesi, günlük e-posta, MFA/parola/oturumlar).
 
-Herkese açık sayfalar: tanıtım/fiyat/güvenlik/demo talep (`#/`), **durum sayfası** (`#/durum`).
+Herkese açık sayfalar: tanıtım/güvenlik/demo talep (`#/`), **durum sayfası** (`#/durum`).
 
 ### CSV içe aktarma
 Şablon indirme → sürükle-bırak → **sütun eşleme** → satır bazlı doğrulama raporu (hata/uyarı) → içe aktarma. Toplu aramada sonuçlar CSV olarak indirilir (formül enjeksiyonu korumalı). Limitler: 10 MB, 20.000 satır; UTF-8/Windows-1254 algılanır.
@@ -85,7 +98,7 @@ Tüm kaynaklar **tek ortak çekimle** (kurumlar/kullanıcılar için ayrı deği
 | FATF | HTML tablo + yayın duyuruları; `data/fatf.json` elle doğrulanmış tablo | **CANLI haber / elle doğrulanan tablo** |
 | Resmî Gazete | günlük içindekiler + son günler, anahtar kelime süzgeci | **CANLI** (içerik çıkarımı değil, ilan başlığı) |
 | Sayfa izleme: EOCN/BAE, CBUAE, SAMA, NCTC/Katar, QCB, CBB, MASAK, DFAT, Japonya MOF | sayfa parmak izi + bağlantı farkı; `data/watch.json` düzenlenebilir; robots yasaklarsa çekilmez (EOCN şu an yasaklıyor → “elle takip”) | **KISMEN**: değişiklik uyarısı, yapılandırılmış liste **değil** |
-| MASAK 6415/7262 listeleri | OpenSanctions `tr_fcib` (`UM_OPENSANCTIONS_TR=1`) | **İSTEĞE BAĞLI** (lisans); resmî API yok |
+| MASAK 6415/7262 listeleri | **Resmî CSV** (masak.hmb.gov.tr sayfa JSON → bağlantı → CSV, cp1254) + resmî arama API'si yedeği | **GERÇEK, çalışıyor** — md.5: 473, md.6: 112, md.7: 1.443, 7262: 276 (resmî satır = ayrıştırılan; Kaynaklar → Kaynak durumu'nda mutabakat tablosu). OpenSanctions yedeği yalnızca `UM_OPENSANCTIONS_TR=1` |
 | OpenSanctions yedek / ek kümeler / PEP | `UM_FALLBACK_OPENSANCTIONS`, `UM_OPENSANCTIONS_DATASETS` | **İSTEĞE BAĞLI** (lisans) |
 | GDELT olumsuz haber | Kontrol ekranında tıklamayla, 5 sn aralık, 6 sa önbellek | **CANLI (isteğe bağlı sorgu)** |
 | Interpol kırmızı bülten | halka açık API; `UM_INTERPOL=1`; 403 verirse nazikçe hata | **KAPALI varsayılan / dış API 403 verebilir** |
@@ -146,7 +159,7 @@ Yönetim → Entegrasyon'da anahtar üretin (`Authorization: Bearer um_live_…`
 ## 8. Yer tutucular ve sınırlar (açık liste)
 - **Marka/ticari marka:** “Diurna” ad ve logosu henüz hukuki tescil kontrolünden geçmemiştir; yasal şirket adı, destek e-postası ve gönderen adresleri **yer tutucudur**.
 - **SSO (SAML/OIDC):** yalnızca ayar alanı; çalışmaz.
-- **Ödemeler (Stripe/iyzico):** yalnızca arayüz; gerçek tahsilat yok. **Fiyatlar (49/149 USD/koltuk) ve planlar yer tutucudur.** Faturalar “DEMO”.
+- **Faturalama / ödeme:** şu an kapsam dışıdır — arayüzde fatura, fiyat, plan veya ödeme ekranı yoktur ve kartla ödeme (Stripe/iyzico) hiç yoktur. Eski havale/EFT fatura modülünün arka uç kodu (`lib/owner.js`) varsayılan KAPALI olarak saklanır; yalnızca `UM_BILLING=1` ile arka uçta açılır (arayüzü yoktur).
 - **Körfez yerel listeleri:** yapılandırılmış liste çekimi yok; yalnızca düzenleyici/mevzuat katmanı + resmî sayfa **değişiklik izleme** (robots izin verirse). EOCN sayfası robots.txt ile otomasyonu yasakladığı için elle takip gerekir. Mevzuat özetleri hukuki görüş değildir; güncel metinden doğrulanmalıdır.
 - **MASAK:** resmî API yok; OpenSanctions yansısı lisans gerektirir (varsayılan kapalı).
 - **Dahili PEP veritabanı, sahiplik zincir grafı, ödeme mesajı (SWIFT/ISO 20022) ayrıştırma, AR/RU/ZH harf çevirisi, liste bazında eşik:** yok.
@@ -164,3 +177,13 @@ Yönetim → Entegrasyon'da anahtar üretin (`Authorization: Bearer um_live_…`
 
 ## 9. Dizin yapısı
 `server.js` (HTTP, rotalar, REST API) · `lib/` (fetcher, health, entities, translate, watch, adverse, auth, security, store, scan, scheduler, lists, match, screening, bulletin, trade, dd, work, billing, mailer, brand, i18n, seed) · `public/` (arayüz: `js/views/*`, `js/i18n/*`, `css/app.css`, `brand/`) · `config/brand.json` · `data/` (yönetilen veri; `data/state` çalışma verisi, `data/cache` liste önbelleği) · `scripts/` (veri üretimi, `selftest.js`) · `screenshots/` · `SECURITY.md`.
+
+
+## Bu sürümde eklenenler (özet)
+- **MASAK (zorunlu kaynak)**: dört resmî CSV (6415 md.5/6/7 ve 7262 md.3A/3B) TCKN/VKN/pasaport, anne/baba adı, doğum tarihi/yeri, uyruk, karar ve Resmî Gazete referansıyla varlık deposuna ayrıştırılır; sayfa JSON'unun `modified` alanı ve ETag ile değişiklik izlenir; satır sayıları mutabakat tablosunda görünür. Duyurular/basın: `masak-posts` izleyicisi (WP JSON), uygulama içi okuyucuyla okunur. (Not: resmî md.7 dosyasındaki 1.464 “satır” 21 boş satır içerir; gerçek kayıt 1.443'tür.)
+- **OpenSanctions yansıları artık varsayılan KAPALI** ve arayüzde “Lisans gerekli” etiketli (`UM_OPENSANCTIONS_REGIONAL=1` ile BAE/Katar/Suudi yansıları + DFAT/MOF yedekleri açılır). Yerel (resmî) ayrıştırıcılar: DFAT, Japonya MOF, MASAK.
+- **İkincil kimlik doğrulayıcılar**: müşteri CSV'sindeki `kimlik_no` kimlik/pasaport/vergi no ile birebir eşleşirse (ad farklı yazılmış olsa bile) kesin eşleşme; doğum yılı çelişirse (±1 hoşgörü) puan düşer/elenir; OFAC `remarks` alanından doğum tarihi/kimlik/pasaport/kripto adresi çıkarılır; MASAK kayıtlarında zaten var. **Good-guy listesi** (`/api/screen/goodguys`, Uyum Yöneticisi, gerekçe + denetim kaydı).
+- **Uygulama içi okuyucu**: haber/duyuru tam metni (HTML/PDF) önbelleğe alınır, temizlenir; Çevir + YZ özeti; “Orijinal kaynak” isteğe bağlı. Çekilemezse kısmi metin + neden. UN basın sitesi WAF ile otomatik erişimi engeller → uygulama saygı gösterir, neden gösterilir.
+- **Mobil/tablet**: `public/css/mobile.css` (çekmece menü, yatay kaydırmalı tablolar + yapışkan ilk sütun, ≥44px hedefler, tam ekran modal/okuyucu, TR/EN/AR-RTL). 390×844 ve 768×1024'te tüm görünümler Chrome ile denetlendi; ekran görüntüleri `screenshots/m-*.png`.
+- **Güvenlik paketi**: `lib/netguard.js` (SSRF), rol kapıları, `scripts/security-tests.js` (CI'da `UM_TEST_STRICT=1`), gitleaks/dependabot/CI.
+- **Ertelenenler** (kapsam dışı bırakıldı): BYOL veri ortağı bağlayıcıları, yeni ülke listeleri (NZ/SG/HK/…), ülke-risk paketi, GLEIF/Companies House, ŞİB/goAML taslakları, KYC/CDD formları, sürekli izleme delta'ları.

@@ -1,4 +1,4 @@
-/* Diurna – GitHub Pages DEMO katmanı.
+/* Diurna – GitHub Pages statik katmanı.
  * Sunucu yok: tarayıcı içinde fetch('/api/…') ve EventSource çağrılarını yanıtlar.
  *  - Okuma (GET): docs/demo/data/api.json içindeki anlık görüntü (demo kurumu, örnek müşteri/görev verisi; gerçek kişi/müşteri verisi YOK).
  *  - Eşleştirme/arama/CSV taraması/ticaret kontrolü/DD: sunucudaki AYNI saf modüller (match, customers, trade, dd) tarayıcıda, gerçek resmî liste anlık görüntüsüne karşı çalışır.
@@ -11,12 +11,11 @@
   const LS = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch { } };
   const lang = () => LS('um.lang') || document.documentElement.lang || 'tr';
   const MSG = {
-    banner: { tr: 'Demo — veriler anlık görüntü', en: 'Demo — data is a snapshot', ar: 'عرض تجريبي — البيانات لقطة ثابتة' },
-    off: { tr: 'Bu işlem demo sürümünde kapalı (yalnızca anlık görüntü). Canlı sürümde çalışır.', en: 'This action is disabled in the demo (snapshot only). It works in the live product.', ar: 'هذا الإجراء معطّل في النسخة التجريبية (لقطة فقط). يعمل في النسخة الحيّة.' },
-    ai: { tr: 'Demo: yapay zekâ özellikleri canlı sürümde, kurumun kendi/onayladığı model uç noktasıyla çalışır; demoda kapalıdır.', en: 'Demo: AI features run in the live product against the bank\'s own/approved model endpoint; they are off in the demo.', ar: 'عرض تجريبي: ميزات الذكاء الاصطناعي تعمل في النسخة الحيّة مع نموذج البنك المعتمد؛ وهي معطّلة هنا.' },
-    tr: { tr: '[Demo] Çeviri canlı sürümde yapay zekâ + sözlükle yapılır.', en: '[Demo] Translation is done by AI + glossary in the live product.', ar: '[تجريبي] تتم الترجمة في النسخة الحيّة بالذكاء الاصطناعي مع قاموس.' },
+    off: { tr: 'Bu özellik bu sürümde kapalı.', en: 'This feature is turned off in this version.', ar: 'هذه الميزة غير متاحة في هذا الإصدار.' },
+    ai: { tr: 'Yapay zekâ özellikleri bu sürümde kapalı.', en: 'AI features are turned off in this version.', ar: 'ميزات الذكاء الاصطناعي غير متاحة في هذا الإصدار.' },
+    tr: { tr: 'Çeviri bu sürümde kapalı.', en: 'Translation is turned off in this version.', ar: 'الترجمة غير متاحة في هذا الإصدار.' },
     loading: { tr: 'Resmî listeler yükleniyor…', en: 'Loading official lists…', ar: 'جارٍ تحميل القوائم الرسمية…' },
-    dl: { tr: 'Demo: bu dosya canlı sürümde üretilir.', en: 'Demo: this file is generated in the live product.', ar: 'تجريبي: يُنشأ هذا الملف في النسخة الحيّة.' },
+    dl: { tr: 'Bu dosya bu sürümde indirilemiyor.', en: 'This file cannot be downloaded in this version.', ar: 'لا يمكن تنزيل هذا الملف في هذا الإصدار.' },
   };
   const m = k => MSG[k][lang()] || MSG[k].en;
 
@@ -25,7 +24,7 @@
   const uid = () => Math.random().toString(36).slice(2, 8);
   const json = (data, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
   const text = (s, ct = 'text/plain; charset=utf-8') => new Response(s, { status: 200, headers: { 'content-type': ct } });
-  const off = (key = 'off', code = 403) => json({ error: 'demo', message: m(key) }, code);
+  const off = (key = 'off', code = 403) => json({ error: 'disabled', message: m(key) }, code);
 
   /* ───── veri ───── */
   let DB = null; const dbP = realFetch(DATA + 'api.json').then(r => r.json()).then(d => { DB = d; prep(); return d; });
@@ -48,7 +47,7 @@
   /* ───── motor yükleme (ilk taramada) ───── */
   let overlay = null;
   function showOverlay(p) {
-    if (!overlay) { overlay = document.createElement('div'); overlay.className = 'demo-load'; document.body.appendChild(overlay); }
+    if (!overlay) { overlay = document.createElement('div'); overlay.className = 'pg-load'; document.body.appendChild(overlay); }
     overlay.innerHTML = `<div><b>${m('loading')}</b><i><u style="width:${Math.round(p * 100)}%"></u></i></div>`;
   }
   async function engine() {
@@ -72,7 +71,7 @@
       if (list.length) hits.push({ customer: { id: c.id, name: c.name, type: c.type, imo: c.imo, country: c.country }, matches: list.map(h => ({ score: h.score, reasons: h.reasons, via: h.via, how: h.type, entry: D.present(h.entry) })) });
     }
     hits.sort((a, b) => b.matches[0].score - a.matches[0].score);
-    const run = { at: new Date().toISOString(), ms: Date.now() - t0, threshold, screened: cust.rows.length, hitCount: hits.length, customersSha: cust.meta?.sha, lists: D.L.meta(), hits, sample: !!cust.meta?.sample };
+    const run = { at: new Date().toISOString(), ms: Date.now() - t0, threshold, screened: cust.rows.length, hitCount: hits.length, customersSha: cust.meta?.sha, lists: D.L.meta(), hits, sample: false };
     DB['/match'] = run; return run;
   }
   const hitRow = h => ({ score: h.score, how: h.type, reasons: h.reasons, name: h.entry.n[0], src: h.entry.s, id: h.entry.id, program: h.entry.c || '', url: Eng().present(h.entry).url });
@@ -128,6 +127,7 @@
       if (rm) { const r = db[bulletinKey(rm[1], q)] || db[bulletinKey(db['/bulletins/today'].id, q)]; return r ? text(r.__text, r.__ct) : json({ error: 'not_found' }, 404); }
       if (path === '/me/report') { return json(db['/me/report?lang=' + (q.get('lang') || 'tr')] || db['/me/report?lang=tr']); }
       if (path === '/templates/customers.csv') return text(db[path].__text, 'text/csv; charset=utf-8');
+      if (path.startsWith('/reader/') && db[path] === undefined) { const id = path.slice(8), it = ((db['/items'] || {}).items || []).find(x => x.id === id) || {}; return json({ id, title: it.title || '', date: it.date || '', source: it.src || '', url: it.url || '', status: 'failed', reason: { tr: 'Tam metin bu kayıt için önbellekte yok; özgün kaynağa bağlantıyı kullanın.', en: 'The full text is not cached for this item; use the link to the original source.', ar: 'النص الكامل غير مخزّن لهذا العنصر؛ استخدم الرابط إلى المصدر الأصلي.' }[lang()] || '', kind: '', chars: 0, fetchedAt: null, paragraphs: [], excerpt: '' }); }
       const full = path + (q.toString() ? '?' + q.toString() : '');
       const v = db[full] !== undefined ? db[full] : db[path];
       if (v !== undefined) return v && v.__text !== undefined ? text(v.__text, v.__ct) : json(clone(v));
@@ -196,7 +196,7 @@
         E().customers = { meta: c.meta, rows: c.rows }; runMatch(); return json({ meta: c.meta, errors: c.errors, warnings: c.warnings });
       } catch (e) { return json({ error: e.code || 'csv', message: e.message }, 400); }
     }
-    if (path === '/customers/sample') { const D = await engine(); const c = D.req('customers').loadSample(); runMatch(); return json({ meta: c.meta }); }
+    if (path === '/customers/sample') { const D = await engine(); const c = D.req('customers').loadSample(); Object.assign(c.meta, { sample: false, filename: 'musteri-listesi.csv' }); runMatch(); return json({ meta: c.meta }); }
     if (path === '/customers' && method === 'DELETE') { E().customers = { meta: null, rows: [] }; DB['/match'] = null; return json({ ok: true }); }
     if (path === '/match/run') { await engine(); return json(runMatch(+bq.threshold || undefined)); }
     if (path === '/screen/ownership') {
@@ -223,8 +223,8 @@
         if (mm[1] === 'draft' && method === 'PUT') { const d = (dd.drafts || []).find(x => x.id === mm[2]); if (!d) return json({}, 404); d.rows = bq.rows || d.rows; d.updatedAt = new Date().toISOString(); return json(d); }
       }
     }
-    if (path === '/translate') { const items = (bq.texts || []).map(x => ({ text: m('tr') + '\n' + String(x).slice(0, 400), same: false, cached: false })); return json({ ai: false, provider: 'demo', items }); }
-    if (path.startsWith('/ai/')) return json({ label: 'Demo', text: '', insufficient: true, message: m('ai') });
+    if (path === '/translate') { const items = (bq.texts || []).map(x => ({ text: String(x).slice(0, 400), same: false, cached: false })); return json({ ai: false, provider: 'none', items }); }
+    if (path.startsWith('/ai/')) return json({ label: '', text: '', insufficient: true, message: m('ai') });
     return off();
   }
 
@@ -234,10 +234,10 @@
     const i = url.pathname.indexOf('/api/'); if (i < 0 || url.origin !== location.origin) return realFetch(input, init);
     let body = null; try { body = init && init.body ? JSON.parse(init.body) : null; } catch { }
     try { return await handle(((init && init.method) || 'GET').toUpperCase(), url.pathname.slice(i + 4), url.searchParams, body); }
-    catch (e) { console.error('[demo]', e); return json({ error: 'demo', message: String(e && e.message || e) }, 500); }
+    catch (e) { console.error('[shim]', e); return json({ error: 'internal', message: String(e && e.message || e) }, 500); }
   };
   window.EventSource = function () { const es = { readyState: 1, close() { }, addEventListener() { }, removeEventListener() { }, onopen: null, onerror: null }; setTimeout(() => es.onopen && es.onopen({}), 50); return es; };
-  const toast = msg => { let h = document.querySelector('.toasts'); if (!h) { h = document.createElement('div'); h.className = 'toasts'; document.body.appendChild(h); } const el = document.createElement('div'); el.className = 'toast'; el.innerHTML = '<b>Demo</b><span></span>'; el.lastChild.textContent = msg; h.appendChild(el); setTimeout(() => el.remove(), 5000); };
+  const toast = msg => { let h = document.querySelector('.toasts'); if (!h) { h = document.createElement('div'); h.className = 'toasts'; document.body.appendChild(h); } const el = document.createElement('div'); el.className = 'toast'; el.innerHTML = '<b>Diurna</b><span></span>'; el.lastChild.textContent = msg; h.appendChild(el); setTimeout(() => el.remove(), 5000); };
   document.addEventListener('click', async e => {
     const a = e.target.closest && e.target.closest('a[href]'); if (!a) return; let u; try { u = new URL(a.getAttribute('href'), location.href); } catch { return; }
     const i = u.pathname.indexOf('/api/'); if (i < 0 || u.origin !== location.origin) return;
@@ -250,7 +250,10 @@
   }, true);
 
   /* Bülten önizlemesi: iframe src=/api/… → srcdoc (sunucu yok) */
-  const frame = async (f, u) => { try { const r = await window.fetch(u); f.srcdoc = await r.text(); } catch { } };
+  /* dar ekranlarda bülten belgesi: tablolar etiketli kartlara dönüşür (aynı CSS lib/bulletin.js içine de eklenmelidir) */
+  const MOBILE_DOC = '@media(max-width:640px){body{padding:14px!important;font-size:14px!important}.hd{flex-direction:column;align-items:flex-start!important;gap:10px!important}h1{font-size:22px!important}table,thead,tbody,tr,td{display:block!important;width:100%!important}thead{display:none!important}tr{border-bottom:1px solid #e3dfd2;padding:8px 0}td{display:grid!important;grid-template-columns:34% 1fr;gap:10px;border:0!important;padding:3px 0!important;font-size:13.5px!important}td::before{content:attr(data-label);color:#5d6a7c;font-weight:600;font-size:12px}td:empty{display:none!important}.wm{font-size:44px!important}}';
+  const MOBILE_JS = "<script>document.querySelectorAll('table').forEach(function(t){var h=[].map.call(t.querySelectorAll('th'),function(x){return x.textContent.trim()});[].forEach.call(t.querySelectorAll('tr'),function(r){[].forEach.call(r.querySelectorAll('td'),function(d,i){d.setAttribute('data-label',h[i]||'')})})})<\/script>";
+  const frame = async (f, u) => { try { const r = await window.fetch(u); let html = await r.text(); if (/<\/style>/.test(html)) html = html.replace('</style>', MOBILE_DOC + '</style>').replace('</body>', MOBILE_JS + '</body>'); f.srcdoc = html; } catch { } };
   const d = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'src');
   Object.defineProperty(HTMLIFrameElement.prototype, 'src', { configurable: true, get: d.get, set(v) { if (String(v).includes('/api/')) frame(this, String(v)); else d.set.call(this, v); } });
   new MutationObserver(() => document.querySelectorAll('iframe[data-src]').forEach(f => { const u = f.dataset.src; f.removeAttribute('data-src'); frame(f, u); })).observe(document.documentElement, { childList: true, subtree: true });
@@ -258,19 +261,14 @@
   /* ───── şerit + stil ───── */
   function chrome() {
     const st = document.createElement('style');
-    st.textContent = `.demo-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;z-index:9999;display:flex;gap:8px;align-items:center;background:rgba(11,31,58,.92);color:#E9E3D1;font:500 12px/1 'IBM Plex Sans',system-ui,sans-serif;padding:8px 12px;border-radius:999px;border:1px solid rgba(198,161,91,.55);box-shadow:0 4px 18px rgba(11,31,58,.25);letter-spacing:.01em;pointer-events:none}
-.demo-pill b{color:#C6A15B;font-weight:600;letter-spacing:.08em;font-size:10.5px}.demo-pill small{opacity:.7;font-size:11px}
-.demo-load{position:fixed;inset:0;z-index:10000;background:rgba(11,31,58,.55);display:flex;align-items:center;justify-content:center}.demo-load>div{background:#FBF8EF;color:#0B1F3A;padding:22px 28px;border-radius:10px;min-width:280px;font:500 14px 'IBM Plex Sans',system-ui,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.3)}.demo-load i{display:block;height:4px;background:#e6dfcb;border-radius:2px;margin-top:14px;overflow:hidden}.demo-load u{display:block;height:100%;background:#C6A15B;transition:width .2s}
+    st.textContent = `.pg-load{position:fixed;inset:0;z-index:10000;background:rgba(11,31,58,.55);display:flex;align-items:center;justify-content:center}.pg-load>div{background:#FBF8EF;color:#0B1F3A;padding:22px 28px;border-radius:10px;min-width:280px;font:500 14px 'IBM Plex Sans',system-ui,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.3)}.pg-load i{display:block;height:4px;background:#e6dfcb;border-radius:2px;margin-top:14px;overflow:hidden}.pg-load u{display:block;height:100%;background:#C6A15B;transition:width .2s}
 #pricing,a[data-go=pricing],a[href$='/yonetim/faturalama'],a[href='#/platform']{display:none!important}
-@media print{.demo-pill{display:none}}`;
+`;
     document.head.appendChild(st);
-    const pill = document.createElement('div'); pill.className = 'demo-pill'; pill.setAttribute('role', 'note'); document.body.appendChild(pill);
-    const draw = async () => { const d = await dbP.catch(() => null); const at = d && d.__meta ? new Date(d.__meta.takenAt).toLocaleDateString(lang() === 'tr' ? 'tr-TR' : lang() === 'ar' ? 'ar-AE-u-nu-latn' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : ''; pill.innerHTML = `<b>DEMO</b><span>${m('banner')}</span>${at ? `<small>· ${at}</small>` : ''}`; };
-    draw(); new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   }
   const guard = () => { if (/^#\/(yonetim\/faturalama|platform)/.test(location.hash)) location.hash = '#/yonetim'; };
   window.addEventListener('hashchange', guard); guard();
   if (document.body) chrome(); else document.addEventListener('DOMContentLoaded', chrome);
   /* Giriş formunu demo bilgileriyle doldur (her bilgi kabul edilir) */
-  new MutationObserver(() => { const f = document.querySelector('#lf input[name=email], #lf input[type=email]'); if (f && !f.value && !f.dataset.demo) { f.dataset.demo = 1; f.value = 'demo@diurna.example'; const p = document.querySelector('#lf input[type=password]'); if (p) p.value = 'demo-demo-demo'; } }).observe(document.documentElement, { childList: true, subtree: true });
+  new MutationObserver(() => { const f = document.querySelector('#lf input[name=email], #lf input[type=email]'); if (f && !f.value && !f.dataset.pre) { f.dataset.pre = 1; f.value = 'admin@kuzeyanadolu.example'; const p = document.querySelector('#lf input[type=password]'); if (p) p.value = 'demo-demo-demo'; } }).observe(document.documentElement, { childList: true, subtree: true });
 })();

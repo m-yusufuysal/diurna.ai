@@ -1,0 +1,56 @@
+# Diurna gitleaks yapılandırması — `gitleaks git`, `gitleaks dir` ve pre-commit (`gitleaks git --staged`) tarafından kullanılır.
+title = "Diurna secret scanning"
+[extend]
+useDefault = true
+
+# Diurna'ya özgü kurallar
+[[rules]]
+id = "diurna-api-key"
+description = "Diurna API anahtarı (um_live_...)"
+regex = '''um_live_[A-Za-z0-9_-]{20,}'''
+tags = ["diurna"]
+
+[[rules]]
+id = "diurna-data-key"
+description = "UM_DATA_KEY / UM_*_KEY / *_PASSWORD atamasında sabit değer (32 bayt hex/base64 veya parola)"
+regex = '''(?i)\b(UM_DATA_KEY|UM_LLM_API_KEY|UM_DEEPL_KEY|UM_SMTP_PASS|UM_PLATFORM_PASSWORD|UM_DEMO_PASSWORD|TUNNEL_TOKEN)\s*[:=]\s*["']?([A-Za-z0-9+/=_#!$%-]{12,})["']?'''
+secretGroup = 2
+tags = ["diurna"]
+  [rules.allowlist]
+  regexes = ['''\$\{[A-Z_]+(:[-?][^}]*)?\}''', '''(?i)(changeme|example|xxxx|<.*>|…)''']
+
+[[rules]]
+id = "datakey-file"
+description = ".datakey içeriği (64 hex karakter tek satır)"
+path = '''(^|/)\.datakey$'''
+regex = '''^[0-9a-f]{64}$'''
+tags = ["diurna"]
+
+[[rules]]
+id = "platform-admin-file"
+description = "Geçici platform yöneticisi parolası dosyası"
+path = '''(^|/)platform-admin\.txt$'''
+regex = '''(?i)geçici parola:\s*\S+'''
+tags = ["diurna"]
+
+[[rules]]
+id = "argon2-hash"
+description = "Parola özeti (argon2/scrypt) — users.json sızıntısı"
+regex = '''\$argon2(id|i|d)\$v=\d+\$m=\d+,t=\d+,p=\d+\$[A-Za-z0-9+/]+\$[A-Za-z0-9+/]+|scrypt\$[0-9a-f]{32}\$[0-9a-f]{128}'''
+tags = ["diurna"]
+
+[allowlist]
+description = "Bilinen yanlış pozitifler"
+paths = [
+  '''package-lock\.json$''',
+  '''node_modules/''',
+  '''data/fonts/''',
+  '''\.woff2?$''',
+]
+regexes = [
+  # AB FSF herkese açık dosya adresi: token=dG9rZW4tMjAxNw (= base64 "token-2017"), AB'nin belgelenmiş herkese açık belirteci
+  '''dG9rZW4tMjAxNw''',
+  # selftest/README'deki ÖRNEK parola (yalnızca yerel demo); üretimde demo tohumlama kapalıdır (NODE_ENV=production)
+  '''Uyum-Demo#2026''',
+  '''Tamga-Kule#2026x''',
+]

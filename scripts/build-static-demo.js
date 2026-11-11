@@ -36,15 +36,39 @@ patch('js/views/landing.js', s => s.replace(/<section class="lp-sec" id="pricing
 
 patch('js/views/bulten.js', s => s.replace(/<iframe class="prev"([^>]*?) src="\/api\//, '<iframe class="prev"$1 data-src="/api/'));
 
+/* 2c) Metin ve veri temizliği: sitede "demo/örnek" ibaresi kalmaz (başlıklar, şeritler, kurum/kişi adları, etiketler) */
+const REPL = [[/Demo Banka A\.Ş\. \(DEMO\)/g, 'Kuzey Anadolu Bankası A.Ş.'], [/Demo Banka A\.Ş\./g, 'Kuzey Anadolu Bankası A.Ş.'], [/demo-banka\.example/g, 'kuzeyanadolu.example'],
+  [/Örnek Şube 1 \(DEMO\)/g, 'Kadıköy Şubesi'], [/Örnek Şube 2 \(DEMO\)/g, 'Ataşehir Şubesi'], [/Örnek Şube 3 \(DEMO\)/g, 'Bornova Şubesi'], [/Örnek Şube (\d+)/g, 'Şube $1'],
+  [/ \(DEMO\)/g, ''], [/DEMO · /g, ''], [/DEMO kuruluşu oluşturuldu/g, 'Kuruluş oluşturuldu'], [/DEMO – örnek görev/g, ''], [/DEMO – örnek iş akışı kaydı/g, ''], [/DEMO kaydı\./g, 'Kayıt oluşturuldu.'], [/^demo$/, 'kab'], [/"demo"/g, '"kab"'], [/Olası eşleşme incelemesi \(örnek\)/g, 'Olası eşleşme incelemesi'],
+  [/Doc2 örnek yazışması/g, 'Doc2 yazışması'], [/SAMPLE STAR/g, 'ANATOLIAN STAR'], [/sample-customers\.csv/g, 'musteri-listesi.csv'], [/ornek-musteriler\.csv/g, 'musteri-listesi.csv'], [/ORNEK-(\d+)/g, 'MST-$1']];
+const clean = x => { if (typeof x === 'string') { for (const [a, b] of REPL) x = x.replace(a, b); return x; } if (Array.isArray(x)) return x.map(clean); if (x && typeof x === 'object') { const o = {}; for (const k of Object.keys(x)) { if (k === 'demo' || k === 'sample') { if (k === 'sample' && typeof x[k] !== 'boolean') o[k] = clean(x[k]); continue; } o[clean(k)] = clean(x[k]); } return o; } return x; };
+const DD = path.join(OUT, 'demo', 'data');
+try {
+  const ap = path.join(DD, 'api.json'), api = clean(JSON.parse(fs.readFileSync(ap, 'utf8')));
+  for (const u of [api['/status']?.user, ...(api['/users']?.users || [])]) if (u) u.demo = undefined;
+  if (api['/translate/info']) Object.assign(api['/translate/info'], { provider: 'none', configured: false });
+  fs.writeFileSync(ap, JSON.stringify(api));
+  const cp = path.join(DD, 'sample-customers.csv'); fs.writeFileSync(cp, clean(fs.readFileSync(cp, 'utf8')));
+} catch (e) { console.warn('veri temizliği uygulanamadı:', e.message); }
+/* arayüz metinleri (TR/EN/AR): demo ifadeleri nötr karşılıklarla değişir */
+const STR = {
+  'lp.cta': ['Görüşme talep edin', 'Request a call', 'اطلب اجتماعًا'], 'lp.tryDemo': ['Giriş yap', 'Sign in', 'تسجيل الدخول'], 'lp.demoTitle': ['Bize ulaşın', 'Get in touch', 'تواصل معنا'],
+  'lp.kvkk': ['Verileriniz yalnızca bu talep için kullanılır (KVKK/GDPR).', 'Your data is used only for this request (KVKK/GDPR).', 'تُستخدم بياناتك لهذا الطلب فقط (KVKK/GDPR).'],
+  'lp.shotCap': ['Bugün ekranı.', 'The Today view.', 'شاشة «اليوم».'], 'demo.banner': ['', '', ''], 'login.demoTitle': ['', '', ''], 'login.demoText': ['', '', ''], 'rep.demoNote': ['', '', ''],
+  'adm.sub': ['Kuruluş, kullanıcılar, şubeler, mevzuat, entegrasyonlar ve güvenlik.', 'Organisation, users, branches, regulation, integrations and security.', 'المؤسسة والمستخدمون والفروع والتشريعات والتكاملات والأمان.'], 'ctl.sampleLoaded': ['Liste yüklendi', 'List loaded', 'تم تحميل القائمة'], 'common.sampleData': ['', '', ''], 'ctl.sampleBanner': ['', '', ''], 'ctl.useSample': ['Örnek müşteri listesini yükle', 'Load the sample customer list', 'تحميل قائمة العملاء النموذجية'] };
+['tr', 'en', 'ar'].forEach((lg, i) => patch('js/i18n/' + lg + '.js', src => { for (const [k, v] of Object.entries(STR)) src = src.replace(new RegExp('("' + k.replace('.', '\\.') + '": )"(?:[^"\\\\]|\\\\.)*"'), (m0, a) => a + JSON.stringify(v[i])); return src; }));
+patch('js/views/login.js', s => s.replace(/\$\{!ticket \? h`<div class="callout info"[^`]*login\.demoTitle[^`]*`\s*:\s*''\}/, ''));
+patch('js/views/raporlar.js', s => s.replace(/\s*<div class="callout info" style="margin-top:18px">\$\{t\('rep\.demoNote'\)\}<\/div>/, ''));
+
 /* 3) brand.css (sunucuda dinamik üretilir) */
 try { fs.writeFileSync(path.join(OUT, 'brand.css'), require(path.join(SRC, 'lib', 'brand')).css()); } catch (e) { console.warn('brand.css üretilemedi:', e.message); fs.writeFileSync(path.join(OUT, 'brand.css'), ':root{--navy:#0B1F3A;--gold:#C6A15B}'); }
 
 /* 4) index.html: demo kabuğu */
 let ix = fs.readFileSync(path.join(OUT, 'index.html'), 'utf8');
 ix = ix.replace('<script src="js/boot.js"></script>', '<script src="demo/engine.js"></script>\n<script src="demo/shim.js"></script>\n<script src="js/boot.js"></script>');
-ix = ix.replace(/<title>.*?<\/title>/, '<title>Diurna — Demo</title>').replace('</head>', '<meta name="robots" content="noindex">\n</head>');
+ix = ix.replace(/<title>.*?<\/title>/, '<title>Diurna</title>').replace('</head>', '<meta name="robots" content="noindex">\n</head>');
 fs.writeFileSync(path.join(OUT, 'index.html'), ix);
-fs.writeFileSync(path.join(OUT, '404.html'), '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=./"><a href="./">Diurna demo</a>');
+fs.writeFileSync(path.join(OUT, '404.html'), '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=./"><a href="./">Diurna</a>');
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 
 /* 5) shim + tarayıcı motoru (sunucu kütüphanelerinin saf JS modülleri, Node bağımlılıkları taklit edilerek) */

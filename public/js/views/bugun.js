@@ -1,5 +1,5 @@
 import { S, h, raw, t, L, api, me, esc, rel, fmtD, fmtLong, num, hilite, canWrite, isManager, toast } from '../core.js';
-import { icon, typeBadge, baseBadge, srcName, statusPill, tabsBar, emptyState, tip, modal, trBtn, aiBtn } from '../ui.js';
+import { icon, typeBadge, baseBadge, srcName, statusPill, tabsBar, emptyState, tip, modal, trBtn, aiBtn, readBtn } from '../ui.js';
 
 export function itemCard(it, kws, opts = {}) {
   const ents = (it.entities || []).slice(0, 3); const more = (it.entities || []).length - ents.length;
@@ -9,7 +9,7 @@ export function itemCard(it, kws, opts = {}) {
   ${ents.length ? h`<div style="margin-top:6px">${ents.map(e => h`<div class="entity"><span class="tag">${t('ent.' + e.type)}</span><b>${e.name}</b>${e.imo?.length ? h`<span class="mono muted">IMO ${e.imo.join(', ')}</span>` : ''}${e.program ? h`<span class="muted xs">${e.program}</span>` : ''}</div>`)}${more > 0 ? h`<div class="xs muted">+${more}</div>` : ''}</div>` : ''}
   ${it.baseCheck?.state === 'possible' ? h`<div class="callout err" style="margin-top:8px;padding:8px 12px"><b class="small">${t('base.possible', { n: it.baseCheck.matches.length })}</b> — ${it.baseCheck.matches.slice(0, 2).map(m => `${m.customerName} (${m.score})`).join('; ')}</div>` : ''}
   ${it.vesselWarning ? h`<div class="callout" style="margin-top:8px;padding:8px 12px"><b class="small">${t('item.vesselWarn')}</b></div>` : ''}
-  <div class="row wrap" style="margin-top:10px"><a class="btn sm" href="${it.url}" target="_blank" rel="noopener noreferrer">${icon.ext} ${t('item.source')}</a>${canWrite() && !opts.noTask ? h`<button class="btn sm" data-task="${it.id}">${icon.plus} ${t('item.task')}</button>` : ''}${trBtn()}${['eu', 'fr', 'rg'].includes(it.srcKey) ? aiBtn('regulation', { itemId: it.id }, { label: t('ai.btn.regulation') }) : ''}<span class="sp"></span><span class="xs muted">${t('item.seen')} ${rel(it.firstSeen)}</span></div></article>`;
+  <div class="row wrap" style="margin-top:10px">${readBtn(it.id)}<a class="btn sm ghost" href="${it.url}" target="_blank" rel="noopener noreferrer">${icon.ext} ${t('rd.orig')}</a>${canWrite() && !opts.noTask ? h`<button class="btn sm" data-task="${it.id}">${icon.plus} ${t('item.task')}</button>` : ''}${trBtn()}${['eu', 'fr', 'rg'].includes(it.srcKey) ? aiBtn('regulation', { itemId: it.id }, { label: t('ai.btn.regulation') }) : ''}<span class="sp"></span><span class="xs muted">${t('item.seen')} ${rel(it.firstSeen)}</span></div></article>`;
 }
 export async function taskModal(prefill = {}) {
   const d = await api('/tasks'); const meu = me();
