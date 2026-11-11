@@ -235,6 +235,17 @@
           }
         },
         {
+          "key": "list:fr",
+          "name": "Fransa – Ulusal Mal Varlığı Dondurma Kaydı (DG Trésor)",
+          "url": "https://gels-avoirs.dgtresor.gouv.fr/",
+          "auto": true,
+          "scope": {
+            "tr": "Fransa Hazine Genel Müdürlüğü’nün resmî mal varlığı dondurma kaydı: AB ve BM tedbirleri ile ulusal dondurma kararları (kişi, kuruluş, gemi). Günlük okunur; kurumunuz taramaya Yönetim → Listeler’den ekler.",
+            "en": "The French Treasury’s official asset-freeze register: EU and UN measures plus national freezes (persons, entities, vessels). Read daily; your institution adds it to screening under Administration → Lists.",
+            "ar": "سجل تجميد الأصول الرسمي لدى وزارة الخزانة الفرنسية: تدابير الاتحاد الأوروبي والأمم المتحدة وقرارات التجميد الوطنية (أشخاص وكيانات وسفن). يُقرأ يوميًا؛ تضيفه مؤسستك إلى الفحص من الإدارة ← القوائم."
+          }
+        },
+        {
           "key": "list:ch",
           "name": "İsviçre – SECO yaptırım listesi",
           "url": "https://www.sesam.search.admin.ch/sesam-search-web/pages/downloadXmlGesamtliste.xhtml?lang=en&action=downloadXmlGesamtlisteAction",
