@@ -449,3 +449,8 @@ tr.clk{cursor:pointer}tr.clk:hover td{background:var(--surface-2)}
 .ai-list{margin:0;padding-inline-start:18px;font-size:14px;line-height:1.55}.ai-list li{margin:3px 0}
 a.cite,span.cite{font-size:11px;color:#3d5a8a;text-decoration:none;margin-inline-start:2px}a.cite:hover{text-decoration:underline}
 .ai-src a{color:inherit}.ai-sum{margin:14px 0 0}
+
+/* Güvenlik ağı: sınıf kuralı olmayan her simge (aria-hidden SVG) 1.1em ile sınırlanır; belirli kurallar (.btn svg, .nav a svg …) bunu ezer. */
+:where(svg[aria-hidden=true]){width:1.1em;height:1.1em;flex:none;vertical-align:-.15em}
+.pop .it{align-items:center}.pop .it svg{width:18px;height:18px;flex:none;color:var(--muted)}
+.rail-row:has(+ .rail-why){border-bottom:0}.rail-why{margin:-4px 0 0;padding:0 0 7px;border-bottom:1px solid var(--line);overflow-wrap:anywhere;line-height:1.4}

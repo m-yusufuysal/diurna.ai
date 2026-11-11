@@ -50,11 +50,22 @@ const PUBLIC_ROUTES = new Set(['GET /api/public/brand', 'POST /api/auth/login', 
 
 function sourceMeta() {
   const jobs = sched.snapshot(); const st = scan.sourceStatuses(); const lm = L.meta();
-  const out = scan.ORDER.map(k => ({
+  /* Etkin durum: haber taraması (scan) varsa o; yoksa (yalnızca liste kaynakları ya da henüz ilk tarama yazılmamış) işlerden (news:/list:) türetilir.
+     Böylece “Bekliyor / Hiç” yalnızca gerçekten hiç çalışmamış kaynakta görünür; hata/engel gerçek nedenle gösterilir. */
+  const derive = o => {
+    if (o.status && o.status !== 'pending') return o;
+    const js = [o.newsJob, o.listJob].filter(Boolean); if (!js.length) return o;
+    const lastOk = js.map(j => j.lastOk).filter(Boolean).sort().pop() || o.list?.fetchedAt || null;
+    const bad = js.find(j => ['error', 'blocked'].includes(j.status) && (!j.lastOk || (j.lastRun && j.lastRun > j.lastOk)));
+    const status = bad ? (lastOk ? 'degraded' : bad.status) : (lastOk ? 'ok' : 'pending');
+    return { ...o, status, lastOk, lastRun: js.map(j => j.lastRun).filter(Boolean).sort().pop() || null, error: bad?.lastError || null, derived: true };
+  };
+  const why = o => { if (o.status === 'ok' || o.status === 'info') return o; const e = o.error || Object.values(o.parts || {}).map(p => p && !p.ok && p.error).find(Boolean) || o.listJob?.lastError || o.newsJob?.lastError || ''; const kind = !e ? (o.status === 'degraded' ? 'partial' : null) : /robots/i.test(e) ? 'robots' : /zaman a/i.test(e) ? 'timeout' : /HTTP\s?\d|\b40\d\b|\b50\d\b/.test(e) ? 'http' : /fetch failed|ECONN|ENOTFOUND|SSRF|alınamadı|ulaşıl/i.test(e) ? 'net' : 'other'; return { ...o, reasonKind: kind, reason: e ? String(e).slice(0, 160) : null }; };
+  const out = scan.ORDER.map(k => why(derive({
     key: k, name: S.SRC[k].name, code: S.SRC[k].code, page: S.SRC[k].page, ...st[k],
     newsJob: jobs.find(j => j.id === 'news:' + k) || null, listJob: jobs.find(j => j.id === 'list:' + k) || null,
     list: lm[k] ? { count: lm[k].count, fetchedAt: lm[k].fetchedAt, checkedAt: lm[k].checkedAt, ok: lm[k].ok, lastError: lm[k].lastError } : null,
-  }));
+  })));
   out.push({ key: 'state', name: S.SRC.state.name, code: S.SRC.state.code, page: S.SRC.state.page, status: 'info', parts: {}, count: 0, infoOnly: true });
   return out;
 }

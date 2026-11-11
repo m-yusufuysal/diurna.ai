@@ -50,3 +50,10 @@ Quick tunnel adresi her başlatmada değişir ve SLA'sızdır; yalnızca demo i�
 Tünel TLS'i kendisi sonlandırır ve istemci isteğini `http://localhost:3111`'e iletir. Uygulama bunu şu başlıklardan anlar (yalnızca `UM_TRUST_PROXY=1` iken): `X-Forwarded-Proto`/`X-Forwarded-Scheme`, `Forwarded: proto=https`, `X-Forwarded-Ssl: on`, `CF-Visitor`. HTTPS algılanınca oturum çerezi `__Host-um_sid; Secure; HttpOnly; SameSite=Strict` olur ve HSTS eklenir. `scripts/run-forever.sh` `UM_TRUST_PROXY=1` ile başlar. Tünel hiçbir proto başlığı göndermiyorsa `UM_FORCE_SECURE=1` verin.
 Origin denetimi (CSRF'e ek) `Host`, güvenilen vekilde `X-Forwarded-Host` veya `UM_ALLOWED_ORIGINS=ad.a.pinggy.link` ile eşleşmelidir; tünel Host'u `localhost`a yeniden yazıyorsa son ikisinden biri yeterlidir.
 Ücretsiz tüneller geçicidir (süre dolunca adres değişir); kalıcı kullanım için VPS + Docker veya adlandırılmış Cloudflare tüneli kullanın.
+
+## Kaynak durumu: “Bekliyor / Hata / Engellendi” nasıl okunur
+- **Çalışıyor**: son başarılı okuma zamanı gerçektir; uydurma zaman damgası yazılmaz.
+- **Kısmi**: kaynağın bir parçası (ör. izlenen sayfalardan bazıları) okunamadı, kalanı güncel.
+- **Hata / Engellendi**: nedeni satır altında yazar (zaman aşımı, robots.txt, HTTP hatası, ulaşılamıyor).
+- **Bekliyor**: yalnızca henüz hiç çalışmamış kaynakta görünür.
+- `UM_ALLOW_PRIVATE_FETCH=1` yalnızca, DNS’i tüm adresleri özel IP’ye (ör. 198.18.0.1) çözen geliştirme/sandbox ağlarında kullanılır; SSRF korumasını kapatır. **Üretimde ayarlamayın.**
